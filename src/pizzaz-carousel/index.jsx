@@ -4,9 +4,11 @@ import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import markers from "../pizzaz/markers.json";
 import PlaceCard from "./PlaceCard";
+import { useWidgetProps } from "../use-widget-props";
 
 function App() {
-  const places = markers?.places || [];
+  const widgetProps = useWidgetProps(() => markers);
+  const places = widgetProps?.places ?? [];
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
     loop: false,

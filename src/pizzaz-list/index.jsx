@@ -2,9 +2,11 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import markers from "../pizzaz/markers.json";
 import { PlusCircle, Star } from "lucide-react";
+import { useWidgetProps } from "../use-widget-props";
 
 function App() {
-  const places = markers?.places || [];
+  const widgetProps = useWidgetProps(() => markers);
+  const places = widgetProps?.places ?? [];
 
   return (
     <div className="antialiased w-full text-black px-4 pb-2 border border-black/10 rounded-2xl sm:rounded-3xl overflow-hidden bg-white">

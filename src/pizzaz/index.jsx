@@ -17,6 +17,7 @@ import {
   BrowserRouter,
   Outlet,
 } from "react-router-dom";
+import { useWidgetProps } from "../use-widget-props";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZXJpY25pbmciLCJhIjoiY21icXlubWM1MDRiczJvb2xwM2p0amNyayJ9.n-3O6JI5nOp_Lw96ZO5vJQ";
@@ -38,7 +39,8 @@ export default function App() {
   const mapRef = useRef(null);
   const mapObj = useRef(null);
   const markerObjs = useRef([]);
-  const places = markers?.places || [];
+  const widgetProps = useWidgetProps(() => markers);
+  const places = widgetProps?.places ?? [];
   const markerCoords = places.map((p) => p.coords);
   const navigate = useNavigate();
   const location = useLocation();

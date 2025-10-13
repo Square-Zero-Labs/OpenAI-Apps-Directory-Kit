@@ -32,7 +32,7 @@
     },
     {
       "id": "neon-crust-works",
-      "name": "Neon Crust Works",
+      "name": "Oaf Crust Works",
       "coords": [-122.4388, 37.7775],
       "description": "Deep‑dish and cornmeal crust favorites.",
       "city": "Alamo Square",
@@ -42,7 +42,7 @@
     },
     {
       "id": "luna-pie-collective",
-      "name": "Luna Pie Collective",
+      "name": "Oaf Pie Collective",
       "coords": [-122.4077, 37.7990],
       "description": "Wood‑fired pies and burrata in North Beach.",
       "city": "North Beach",
@@ -52,7 +52,7 @@
     },
     {
       "id": "bricklight-deep-dish",
-      "name": "Bricklight Deep Dish",
+      "name": "Oaf Deep Dish",
       "coords": [-122.4097, 37.7992],
       "description": "Chicago‑style pies from Tony Gemignani.",
       "city": "North Beach",

@@ -1,4 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { readFileSync } from "node:fs";
 import { URL } from "node:url";
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -29,6 +30,21 @@ type PizzazWidget = {
   html: string;
   responseText: string;
 };
+
+type PizzazPlace = {
+  id: string;
+  name: string;
+  coords: [number, number];
+  description: string;
+  city: string;
+  rating: number;
+  price: string;
+  thumbnail: string;
+};
+
+const pizzazData: { places: PizzazPlace[] } = JSON.parse(
+  readFileSync(new URL("../data/pizzaz-places.json", import.meta.url), "utf8")
+);
 
 function widgetMeta(widget: PizzazWidget) {
   return {
@@ -218,7 +234,8 @@ function createPizzazServer(): Server {
         }
       ],
       structuredContent: {
-        pizzaTopping: args.pizzaTopping
+        pizzaTopping: args.pizzaTopping,
+        places: pizzazData.places
       },
       _meta: widgetMeta(widget)
     };
