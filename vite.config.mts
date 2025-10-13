@@ -209,7 +209,7 @@ export default defineConfig(({}) => ({
   ],
   cacheDir: "node_modules/.vite-react",
   server: {
-    port: 4444,
+    port: 4044,
     strictPort: true,
     cors: true,
   },

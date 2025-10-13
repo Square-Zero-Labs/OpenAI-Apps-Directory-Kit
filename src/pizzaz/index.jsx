@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { createRoot } from "react-dom/client";
-import markers from "./markers.json";
 import { AnimatePresence } from "framer-motion";
 import Inspector from "./Inspector";
 import Sidebar from "./Sidebar";
@@ -18,6 +17,14 @@ import {
   Outlet,
 } from "react-router-dom";
 import { useWidgetProps } from "../use-widget-props";
+import {
+  defaultStructuredContent,
+  defaultDirectoryUi,
+} from "../directory-defaults";
+import {
+  normalizeDirectoryItems,
+  themeStyleVars,
+} from "../directory-utils";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZXJpY25pbmciLCJhIjoiY21icXlubWM1MDRiczJvb2xwM2p0amNyayJ9.n-3O6JI5nOp_Lw96ZO5vJQ";
@@ -39,19 +46,33 @@ export default function App() {
   const mapRef = useRef(null);
   const mapObj = useRef(null);
   const markerObjs = useRef([]);
-  const widgetProps = useWidgetProps(() => markers);
-  const places = widgetProps?.places ?? [];
-  const markerCoords = places.map((p) => p.coords);
+  const widgetProps = useWidgetProps(() => defaultStructuredContent);
+  const items = widgetProps?.items ?? defaultStructuredContent.items;
+  const ui = widgetProps?.ui ?? defaultDirectoryUi;
+  const themeVars = useMemo(() => themeStyleVars(ui.theme), [ui.theme]);
+  const normalizedPlaces = useMemo(
+    () => normalizeDirectoryItems(items, ui),
+    [items, ui]
+  );
+  const markerColor = ui.theme?.primary ?? "#F46C21";
+  const markerCoords = useMemo(
+    () =>
+      normalizedPlaces
+        .map((place) => place.coords)
+        .filter((coords) => coords != null),
+    [normalizedPlaces]
+  );
   const navigate = useNavigate();
   const location = useLocation();
   const selectedId = React.useMemo(() => {
     const match = location?.pathname?.match(/(?:^|\/)place\/([^/]+)/);
     return match && match[1] ? match[1] : null;
   }, [location?.pathname]);
-  const selectedPlace = places.find((p) => p.id === selectedId) || null;
+  const selectedPlace =
+    normalizedPlaces.find((place) => place.id === selectedId) ?? null;
   const [viewState, setViewState] = useState(() => ({
-    center: markerCoords.length > 0 ? markerCoords[0] : [0, 0],
-    zoom: markerCoords.length > 0 ? 12 : 2,
+    center: markerCoords.length > 0 ? markerCoords[0] ?? [0, 0] : [0, 0],
+    zoom: markerCoords.length > 0 ? ui.map?.defaultZoom ?? 12 : 2,
   }));
   const displayMode = useOpenAiGlobal("displayMode");
   const allowInspector = displayMode === "fullscreen";
@@ -62,11 +83,11 @@ export default function App() {
     mapObj.current = new mapboxgl.Map({
       container: mapRef.current,
       style: "mapbox://styles/mapbox/streets-v12",
-      center: markerCoords.length > 0 ? markerCoords[0] : [0, 0],
-      zoom: markerCoords.length > 0 ? 12 : 2,
+      center: markerCoords.length > 0 ? markerCoords[0] ?? [0, 0] : [0, 0],
+      zoom: markerCoords.length > 0 ? ui.map?.defaultZoom ?? 12 : 2,
       attributionControl: false,
     });
-    addAllMarkers(places);
+    addAllMarkers(normalizedPlaces);
     setTimeout(() => {
       fitMapToMarkers(mapObj.current, markerCoords);
     }, 0);
@@ -99,8 +120,9 @@ export default function App() {
     markerObjs.current.forEach((m) => m.remove());
     markerObjs.current = [];
     placesList.forEach((place) => {
+      if (!place.coords) return;
       const marker = new mapboxgl.Marker({
-        color: "#F46C21",
+        color: markerColor,
       })
         .setLngLat(place.coords)
         .addTo(mapObj.current);
@@ -148,12 +170,12 @@ export default function App() {
 
   useEffect(() => {
     if (!mapObj.current) return;
-    addAllMarkers(places);
-  }, [places]);
+    addAllMarkers(normalizedPlaces);
+  }, [normalizedPlaces]);
 
   // Pan the map when the selected place changes via routing
   useEffect(() => {
-    if (!mapObj.current || !selectedPlace) return;
+    if (!mapObj.current || !selectedPlace || !selectedPlace.coords) return;
     panTo(selectedPlace.coords, { offsetForInspector: true });
   }, [selectedId]);
 
@@ -182,7 +204,11 @@ export default function App() {
       <div
         style={{
           maxHeight,
-          height: displayMode === "fullscreen" ? maxHeight - 40 : 480,
+          height:
+            displayMode === "fullscreen" && maxHeight
+              ? maxHeight - 40
+              : 480,
+          ...themeVars,
         }}
         className={
           "relative antialiased w-full min-h-[480px] overflow-hidden " +
@@ -214,7 +240,8 @@ export default function App() {
         )}
         {/* Sidebar */}
         <Sidebar
-          places={places}
+          places={normalizedPlaces}
+          ui={ui}
           selectedId={selectedId}
           onSelect={(place) => {
             navigate(`/place/${place.id}`);
@@ -228,6 +255,7 @@ export default function App() {
             <Inspector
               key={selectedPlace.id}
               place={selectedPlace}
+              ui={ui}
               onClose={() => navigate("..")}
             />
           )}

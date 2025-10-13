@@ -1,15 +1,29 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import markers from "../pizzaz/markers.json";
 import { PlusCircle, Star } from "lucide-react";
 import { useWidgetProps } from "../use-widget-props";
+import {
+  defaultStructuredContent,
+  defaultDirectoryUi,
+} from "../directory-defaults";
+import { normalizeDirectoryItems, themeStyleVars } from "../directory-utils";
 
 function App() {
-  const widgetProps = useWidgetProps(() => markers);
-  const places = widgetProps?.places ?? [];
+  const widgetProps = useWidgetProps(() => defaultStructuredContent);
+  const items = widgetProps?.items ?? defaultStructuredContent.items;
+  const ui = widgetProps?.ui ?? defaultDirectoryUi;
+  const themeVars = themeStyleVars(ui.theme);
+  const places = normalizeDirectoryItems(items, ui);
+  const listTitle = ui.copy?.listTitle ?? "Directory List";
+  const listSubtitle = ui.copy?.listSubtitle ?? "Curated directory entries";
+  const primaryCta = ui.copy?.primaryCtaLabel ?? "Save List";
+  const emptyState = ui.copy?.emptyState ?? "No locations found.";
 
   return (
-    <div className="antialiased w-full text-black px-4 pb-2 border border-black/10 rounded-2xl sm:rounded-3xl overflow-hidden bg-white">
+    <div
+      className="antialiased w-full text-black px-4 pb-2 border border-black/10 rounded-2xl sm:rounded-3xl overflow-hidden bg-white"
+      style={themeVars}
+    >
       <div className="max-w-full">
         <div className="flex flex-row items-center gap-4 sm:gap-4 border-b border-black/5 py-4">
           <div
@@ -20,19 +34,15 @@ function App() {
             }}
           ></div>
           <div>
-            <div className="text-base sm:text-xl font-medium">
-              National Best Pizza List
-            </div>
-            <div className="text-sm text-black/60">
-              A ranking of the best pizzerias in the world
-            </div>
+            <div className="text-base sm:text-xl font-medium">{listTitle}</div>
+            <div className="text-sm text-black/60">{listSubtitle}</div>
           </div>
           <div className="flex-auto hidden sm:flex justify-end pr-2">
             <button
               type="button"
-              className="cursor-pointer inline-flex items-center rounded-full bg-[#F46C21] text-white px-4 py-1.5 sm:text-md text-sm font-medium hover:opacity-90 active:opacity-100"
+              className="cursor-pointer inline-flex items-center rounded-full bg-[var(--directory-primary, #F46C21)] text-white px-4 py-1.5 sm:text-md text-sm font-medium hover:opacity-90 active:opacity-100"
             >
-              Save List
+              {primaryCta}
             </button>
           </div>
         </div>
@@ -51,39 +61,47 @@ function App() {
               >
                 <div className="py-3 pr-3 min-w-0 w-full sm:w-3/5">
                   <div className="flex items-center gap-3">
-                    <img
-                      src={place.thumbnail}
-                      alt={place.name}
-                      className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg object-cover ring ring-black/5"
-                    />
+                    {place.thumbnail ? (
+                      <img
+                        src={place.thumbnail}
+                        alt={place.title}
+                        className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg object-cover ring ring-black/5"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg bg-[var(--directory-primary, #F46C21)]/10 text-[var(--directory-primary, #F46C21)] flex items-center justify-center font-semibold">
+                        {place.title?.charAt(0) ?? "?"}
+                      </div>
+                    )}
                     <div className="w-3 text-end sm:block hidden text-sm text-black/40">
                       {i + 1}
                     </div>
                     <div className="min-w-0 sm:pl-1 flex flex-col items-start h-full">
                       <div className="font-medium text-sm sm:text-md truncate max-w-[40ch]">
-                        {place.name}
+                        {place.title}
                       </div>
                       <div className="mt-1 sm:mt-0.25 flex items-center gap-3 text-black/70 text-sm">
-                        <div className="flex items-center gap-1">
-                          <Star
-                            strokeWidth={1.5}
-                            className="h-3 w-3 text-black"
-                          />
-                          <span>
-                            {place.rating?.toFixed
-                              ? place.rating.toFixed(1)
-                              : place.rating}
-                          </span>
-                        </div>
+                        {place.rating != null ? (
+                          <div className="flex items-center gap-1">
+                            <Star
+                              strokeWidth={1.5}
+                              className="h-3 w-3 text-black"
+                            />
+                            <span>
+                              {place.rating?.toFixed
+                                ? place.rating.toFixed(1)
+                                : place.rating}
+                            </span>
+                          </div>
+                        ) : null}
                         <div className="whitespace-nowrap sm:hidden">
-                          {place.city || "–"}
+                          {place.subtitle || "–"}
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="hidden sm:block text-end py-2 px-3 text-sm text-black/60 whitespace-nowrap flex-auto">
-                  {place.city || "–"}
+                  {place.subtitle || "–"}
                 </div>
                 <div className="py-2 whitespace-nowrap flex justify-end">
                   <PlusCircle strokeWidth={1.5} className="h-5 w-5" />
@@ -93,16 +111,16 @@ function App() {
           ))}
           {places.length === 0 && (
             <div className="py-6 text-center text-black/60">
-              No pizzerias found.
+              {emptyState}
             </div>
           )}
         </div>
         <div className="sm:hidden px-0 pt-2 pb-2">
           <button
             type="button"
-            className="w-full cursor-pointer inline-flex items-center justify-center rounded-full bg-[#F46C21] text-white px-4 py-2 font-medium hover:opacity-90 active:opacity-100"
+            className="w-full cursor-pointer inline-flex items-center justify-center rounded-full bg-[var(--directory-primary, #F46C21)] text-white px-4 py-2 font-medium hover:opacity-90 active:opacity-100"
           >
-            Save List
+            {primaryCta}
           </button>
         </div>
       </div>

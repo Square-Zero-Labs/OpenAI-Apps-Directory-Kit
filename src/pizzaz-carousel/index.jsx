@@ -2,13 +2,20 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import markers from "../pizzaz/markers.json";
 import PlaceCard from "./PlaceCard";
 import { useWidgetProps } from "../use-widget-props";
+import {
+  defaultStructuredContent,
+  defaultDirectoryUi,
+} from "../directory-defaults";
+import { normalizeDirectoryItems, themeStyleVars } from "../directory-utils";
 
 function App() {
-  const widgetProps = useWidgetProps(() => markers);
-  const places = widgetProps?.places ?? [];
+  const widgetProps = useWidgetProps(() => defaultStructuredContent);
+  const items = widgetProps?.items ?? defaultStructuredContent.items;
+  const ui = widgetProps?.ui ?? defaultDirectoryUi;
+  const themeVars = themeStyleVars(ui.theme);
+  const places = normalizeDirectoryItems(items, ui);
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
     loop: false,
@@ -35,11 +42,14 @@ function App() {
   }, [emblaApi]);
 
   return (
-    <div className="antialiased relative w-full text-black py-5 bg-white">
+    <div
+      className="antialiased relative w-full text-black py-5 bg-white"
+      style={themeVars}
+    >
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex gap-4 max-sm:mx-5 items-stretch">
           {places.map((place) => (
-            <PlaceCard key={place.id} place={place} />
+            <PlaceCard key={place.id} place={place} ui={ui} />
           ))}
         </div>
       </div>

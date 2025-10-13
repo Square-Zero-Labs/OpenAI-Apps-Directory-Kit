@@ -2,8 +2,11 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Star, X } from "lucide-react";
 
-export default function Inspector({ place, onClose }) {
+export default function Inspector({ place, onClose, ui }) {
   if (!place) return null;
+  const locationLabel =
+    place.subtitle ?? ui?.copy?.inspectorLocationLabel ?? "";
+
   return (
     <motion.div
       key={place.id}
@@ -22,54 +25,75 @@ export default function Inspector({ place, onClose }) {
       </button>
       <div className="relative h-full overflow-y-auto rounded-none xl:rounded-3xl bg-white text-black xl:shadow-xl xl:ring ring-black/10">
         <div className="relative mt-2 xl:mt-0 px-2 xl:px-0">
-          <img
-            src={place.thumbnail}
-            alt={place.name}
-            className="w-full rounded-3xl xl:rounded-none h-80 object-cover xl:rounded-t-2xl"
-          />
+          {place.thumbnail ? (
+            <img
+              src={place.thumbnail}
+              alt={place.title}
+              className="w-full rounded-3xl xl:rounded-none h-80 object-cover xl:rounded-t-2xl"
+            />
+          ) : (
+            <div className="w-full h-80 flex items-center justify-center text-3xl font-semibold rounded-3xl bg-[var(--directory-primary, #F46C21)]/10 text-[var(--directory-primary, #F46C21)]">
+              {place.title?.charAt(0) ?? "?"}
+            </div>
+          )}
         </div>
 
         <div className="h-[calc(100%-11rem)] sm:h-[calc(100%-14rem)]">
           <div className="p-4 sm:p-5">
-            <div className="text-2xl font-medium truncate">{place.name}</div>
-            <div className="text-sm mt-1 opacity-70 flex items-center gap-1">
-              <Star className="h-3.5 w-3.5" aria-hidden="true" />
-              {place.rating.toFixed(1)}
+            <div className="text-2xl font-medium truncate">{place.title}</div>
+            <div className="text-sm mt-1 opacity-70 flex items-center gap-1 flex-wrap">
+              {place.rating != null ? (
+                <>
+                  <Star className="h-3.5 w-3.5" aria-hidden="true" />
+                  {place.rating?.toFixed
+                    ? place.rating.toFixed(1)
+                    : place.rating}
+                </>
+              ) : null}
               {place.price ? <span>· {place.price}</span> : null}
-              <span>· San Francisco</span>
+              {locationLabel ? <span>· {locationLabel}</span> : null}
             </div>
             <div className="mt-3 flex flex-row items-center gap-3 font-medium">
-              <div className="rounded-full bg-[#F46C21] text-white cursor-pointer px-4 py-1.5">
-                Add to favorites
+              <div className="rounded-full bg-[var(--directory-primary, #F46C21)] text-white cursor-pointer px-4 py-1.5">
+                {ui?.copy?.secondaryCtaLabel ?? "Add to favorites"}
               </div>
-              <div className="rounded-full border border-[#F46C21]/50 text-[#F46C21] cursor-pointer  px-4 py-1.5">
-                Contact
+              <div className="rounded-full border border-[var(--directory-primary, #F46C21)]/50 text-[var(--directory-primary, #F46C21)] cursor-pointer  px-4 py-1.5">
+                {ui?.copy?.contactCtaLabel ?? "Contact"}
               </div>
             </div>
             <div className="text-sm mt-5">
-              {place.description} Enjoy a slice at one of SF's favorites. Fresh
-              ingredients, great crust, and cozy vibes.
+              {place.description ??
+                ui?.copy?.detailFallback ??
+                "No description available yet."}
             </div>
           </div>
 
           <div className="px-4 sm:px-5 pb-4">
-            <div className="text-lg font-medium mb-2">Reviews</div>
+            <div className="text-lg font-medium mb-2">
+              {ui?.copy?.reviewsTitle ?? "Reviews"}
+            </div>
             <ul className="space-y-3 divide-y divide-black/5">
               {[
                 {
                   user: "Leo M.",
                   avatar: "https://persistent.oaistatic.com/pizzaz/user1.png",
-                  text: "Fantastic crust and balanced toppings. The marinara is spot on!",
+                  text:
+                    ui?.copy?.sampleReviewOne ??
+                    "Fantastic experience and welcoming staff!",
                 },
                 {
                   user: "Priya S.",
                   avatar: "https://persistent.oaistatic.com/pizzaz/user2.png",
-                  text: "Cozy vibe and friendly staff. Quick service on a Friday night.",
+                  text:
+                    ui?.copy?.sampleReviewTwo ??
+                    "Cozy vibe with thoughtful amenities.",
                 },
                 {
                   user: "Maya R.",
                   avatar: "https://persistent.oaistatic.com/pizzaz/user3.png",
-                  text: "Great for sharing. Will definitely come back with friends.",
+                  text:
+                    ui?.copy?.sampleReviewThree ??
+                    "Great for sharing with friends—will return soon!",
                 },
               ].map((review, idx) => (
                 <li key={idx} className="py-3">

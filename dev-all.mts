@@ -1,12 +1,15 @@
 #!/usr/bin/env -S node --enable-source-maps
-import { createServer as createHttpServer, request as httpRequest } from "node:http";
+import {
+  createServer as createHttpServer,
+  request as httpRequest,
+} from "node:http";
 import { URL } from "node:url";
 import { spawn } from "node:child_process";
 import fg from "fast-glob";
 import path from "node:path";
 
-const REACT_PORT = 4450;
-const PROXY_PORT = 4444;
+const REACT_PORT = 4044;
+const PROXY_PORT = 8000;
 
 function detectEntryNames(): string[] {
   const entries = fg.sync("src/**/index.{tsx,jsx}", { dot: false });
@@ -44,7 +47,7 @@ async function main() {
 
   const reactChild = startVite("vite.config.mts", REACT_PORT);
 
-  // Simple proxy to keep legacy 4444 port and allow missing base prefix
+  // Simple proxy to keep legacy 8000 port and allow missing base prefix
   const server = createHttpServer((req, res) => {
     const urlObj = new URL(req.url || "/", `http://localhost:${PROXY_PORT}`);
 
@@ -53,7 +56,7 @@ async function main() {
       res.end(
         `<!doctype html><meta charset=utf-8><title>ecosystem_ui dev</title>` +
           `<style>body{font:13px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;padding:16px}</style>` +
-          `<h1>ecosystem_ui dev proxy (4444)</h1>` +
+          `<h1>ecosystem_ui dev proxy (8000)</h1>` +
           `<p>Entries:</p>` +
           `<ul>` +
           entryNames
@@ -64,7 +67,10 @@ async function main() {
       return;
     }
 
-    const targetUrl = new URL(urlObj.pathname + urlObj.search, `http://localhost:${REACT_PORT}`);
+    const targetUrl = new URL(
+      urlObj.pathname + urlObj.search,
+      `http://localhost:${REACT_PORT}`
+    );
     const opts = {
       method: req.method,
       headers: {
@@ -115,4 +121,3 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-

@@ -1,0 +1,54 @@
+{
+  "label": "Pizzaz Pizza Finder",
+  "slug": "pizzaz",
+  "theme": {
+    "primary": "#F46C21",
+    "accent": "#0B6CF6",
+    "background": "#FFFFFF"
+  },
+  "copy": {
+    "appTitle": "Pizzaz",
+    "listTitle": "National Best Pizza List",
+    "listSubtitle": "A ranking of the best pizzerias in the world",
+    "emptyState": "No pizzerias found.",
+    "primaryCtaLabel": "Save List",
+    "secondaryCtaLabel": "Add to favorites",
+    "contactCtaLabel": "Contact",
+    "inspectorLocationLabel": "San Francisco",
+    "filterLabel": "Filter",
+    "detailFallback": "Enjoy a slice at one of SF's favorites.",
+    "reviewsTitle": "Reviews",
+    "learnMoreLabel": "Learn more",
+    "sampleReviewOne": "Fantastic crust and balanced toppings. The marinara is spot on!",
+    "sampleReviewTwo": "Cozy vibe and friendly staff. Quick service on a Friday night.",
+    "sampleReviewThree": "Great for sharing. Will definitely come back with friends."
+  },
+  "fields": {
+    "title": "name",
+    "subtitle": "city",
+    "description": "description",
+    "rating": "rating",
+    "price": "price",
+    "thumbnail": "thumbnail"
+  },
+  "filters": {
+    "locationField": "city",
+    "attributeField": "price"
+  },
+  "map": {
+    "latitudeField": "coords.1",
+    "longitudeField": "coords.0",
+    "defaultZoom": 12
+  },
+  "dataSource": {
+    "type": "supabase",
+    "url": "https://your-project.supabase.co",
+    "serviceKeyEnv": "SUPABASE_SERVICE_ROLE_KEY",
+    "table": "pizzaz_places",
+    "select": "id,name,description,city,rating,price,coords,thumbnail",
+    "orderBy": {
+      "column": "rating",
+      "ascending": false
+    }
+  }
+}

@@ -5,7 +5,7 @@
   "main": "host/main.ts",
   "scripts": {
     "build": "tsx ./build-all.mts",
-    "serve": "serve -s ./assets -p 4444 --cors",
+    "serve": "serve -s ./assets -p 4044 --cors",
     "dev": "vite --config vite.config.mts",
     "tsc": "tsc -b",
     "tsc:app": "tsc -p tsconfig.app.json",
@@ -32,6 +32,7 @@
     "vite": "^7.1.1"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.48.0",
     "@react-spring/three": "^10.0.1",
     "@react-three/drei": "^10.6.1",
     "@react-three/fiber": "^9.3.0",

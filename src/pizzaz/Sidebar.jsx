@@ -1,7 +1,7 @@
 import React from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useOpenAiGlobal } from "../use-openai-global";
-import { Filter, Settings2, Star } from "lucide-react";
+import { Filter, Star } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 function PlaceListItem({ place, isSelected, onClick }) {
@@ -21,20 +21,35 @@ function PlaceListItem({ place, isSelected, onClick }) {
           className="w-full text-left py-3 transition flex gap-3 items-center"
           onClick={onClick}
         >
-          <img
-            src={place.thumbnail}
-            alt={place.name}
-            className="h-16 w-16 rounded-lg object-cover flex-none"
-          />
-          <div className="min-w-0">
-            <div className="font-medium truncate">{place.name}</div>
-            <div className="text-xs text-black/50 truncate">
-              {place.description}
+          {place.thumbnail ? (
+            <img
+              src={place.thumbnail}
+              alt={place.title}
+              className="h-16 w-16 rounded-lg object-cover flex-none"
+            />
+          ) : (
+            <div className="h-16 w-16 rounded-lg bg-[var(--directory-primary, #F46C21)]/10 flex items-center justify-center text-[var(--directory-primary, #F46C21)] font-semibold">
+              {place.title?.[0] ?? "?"}
             </div>
+          )}
+          <div className="min-w-0">
+            <div className="font-medium truncate">{place.title}</div>
+            {place.description ? (
+              <div className="text-xs text-black/50 truncate">
+                {place.description}
+              </div>
+            ) : null}
             <div className="text-xs mt-1 text-black/50 flex items-center gap-1">
-              <Star className="h-3 w-3" aria-hidden="true" />
-              {place.rating.toFixed(1)}
-              {place.price ? <span className="">· {place.price}</span> : null}
+              {place.rating != null ? (
+                <>
+                  <Star className="h-3 w-3" aria-hidden="true" />
+                  {place.rating?.toFixed
+                    ? place.rating.toFixed(1)
+                    : place.rating}
+                </>
+              ) : null}
+              {place.price ? <span>· {place.price}</span> : null}
+              {place.subtitle ? <span>· {place.subtitle}</span> : null}
             </div>
           </div>
         </button>
@@ -43,12 +58,13 @@ function PlaceListItem({ place, isSelected, onClick }) {
   );
 }
 
-export default function Sidebar({ places, selectedId, onSelect }) {
+export default function Sidebar({ places, selectedId, onSelect, ui }) {
   const [emblaRef] = useEmblaCarousel({ dragFree: true, loop: false });
   const displayMode = useOpenAiGlobal("displayMode");
   const forceMobile = displayMode !== "fullscreen";
   const scrollRef = React.useRef(null);
   const [showBottomFade, setShowBottomFade] = React.useState(false);
+  const headerTitle = ui?.copy?.listTitle ?? "Directory results";
 
   const updateBottomFadeVisibility = React.useCallback(() => {
     const el = scrollRef.current;
@@ -85,9 +101,13 @@ export default function Sidebar({ places, selectedId, onSelect }) {
           className="relative px-2 h-full overflow-y-auto bg-white text-black"
         >
           <div className="flex justify-between flex-row items-center px-3 sticky bg-white top-0 py-4 text-md font-medium">
-            {places.length} results
             <div>
-              <Settings2 className="h-5 w-5" aria-hidden="true" />
+              {headerTitle}
+              <span className="text-sm text-black/50 ml-2">{places.length}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-black/60">
+              <Filter className="h-4 w-4" aria-hidden="true" />
+              {ui?.copy?.filterLabel ?? "Filter"}
             </div>
           </div>
           <div>
