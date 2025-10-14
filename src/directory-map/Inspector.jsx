@@ -14,7 +14,7 @@ export default function Inspector({ place, onClose, ui }) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ type: "spring", bounce: 0, duration: 0.25 }}
-      className="pizzaz-inspector absolute z-30 top-0 bottom-4 left-0 right-auto xl:left-auto xl:right-6 md:z-20 w-[340px] xl:w-[360px] xl:top-6 xl:bottom-8 pointer-events-auto"
+      className="directory-inspector absolute z-30 top-0 bottom-4 left-0 right-auto xl:left-auto xl:right-6 md:z-20 w-[340px] xl:w-[360px] xl:top-6 xl:bottom-8 pointer-events-auto"
     >
       <button
         aria-label="Close details"
@@ -32,7 +32,7 @@ export default function Inspector({ place, onClose, ui }) {
               className="w-full rounded-3xl xl:rounded-none h-80 object-cover xl:rounded-t-2xl"
             />
           ) : (
-            <div className="w-full h-80 flex items-center justify-center text-3xl font-semibold rounded-3xl bg-[var(--directory-primary, #F46C21)]/10 text-[var(--directory-primary, #F46C21)]">
+            <div className="w-full h-80 flex items-center justify-center text-3xl font-semibold rounded-3xl bg-[var(--directory-primary, #2563EB)]/10 text-[var(--directory-primary, #2563EB)]">
               {place.title?.charAt(0) ?? "?"}
             </div>
           )}
@@ -54,10 +54,10 @@ export default function Inspector({ place, onClose, ui }) {
               {locationLabel ? <span>· {locationLabel}</span> : null}
             </div>
             <div className="mt-3 flex flex-row items-center gap-3 font-medium">
-              <div className="rounded-full bg-[var(--directory-primary, #F46C21)] text-white cursor-pointer px-4 py-1.5">
-                {ui?.copy?.secondaryCtaLabel ?? "Add to favorites"}
+              <div className="rounded-full bg-[var(--directory-primary, #2563EB)] text-white cursor-pointer px-4 py-1.5">
+                {ui?.copy?.secondaryCtaLabel ?? "Bookmark"}
               </div>
-              <div className="rounded-full border border-[var(--directory-primary, #F46C21)]/50 text-[var(--directory-primary, #F46C21)] cursor-pointer  px-4 py-1.5">
+              <div className="rounded-full border border-[var(--directory-primary, #2563EB)]/50 text-[var(--directory-primary, #2563EB)] cursor-pointer  px-4 py-1.5">
                 {ui?.copy?.contactCtaLabel ?? "Contact"}
               </div>
             </div>
@@ -76,21 +76,24 @@ export default function Inspector({ place, onClose, ui }) {
               {[
                 {
                   user: "Leo M.",
-                  avatar: "https://persistent.oaistatic.com/pizzaz/user1.png",
+                  avatar:
+                    "https://images.unsplash.com/photo-1521579971123-1192931a1452?auto=format&fit=crop&w=200&q=80",
                   text:
                     ui?.copy?.sampleReviewOne ??
                     "Fantastic experience and welcoming staff!",
                 },
                 {
                   user: "Priya S.",
-                  avatar: "https://persistent.oaistatic.com/pizzaz/user2.png",
+                  avatar:
+                    "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=200&q=80",
                   text:
                     ui?.copy?.sampleReviewTwo ??
                     "Cozy vibe with thoughtful amenities.",
                 },
                 {
                   user: "Maya R.",
-                  avatar: "https://persistent.oaistatic.com/pizzaz/user3.png",
+                  avatar:
+                    "https://images.unsplash.com/photo-1504593811423-6dd665756598?auto=format&fit=crop&w=200&q=80",
                   text:
                     ui?.copy?.sampleReviewThree ??
                     "Great for sharing with friends—will return soon!",

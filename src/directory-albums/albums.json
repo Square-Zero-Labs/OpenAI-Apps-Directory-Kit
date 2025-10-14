@@ -1,0 +1,70 @@
+{
+  "albums": [
+    {
+      "id": "morning-walk",
+      "title": "Morning Walk",
+      "cover": "https://images.unsplash.com/photo-1521579971123-1192931a1452?auto=format&fit=crop&w=600&q=80",
+      "photos": [
+        {
+          "id": "mw-1",
+          "title": "Coffee stop",
+          "url": "https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+          "id": "mw-2",
+          "title": "Waterfront",
+          "url": "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+          "id": "mw-3",
+          "title": "Neighborhood stroll",
+          "url": "https://images.unsplash.com/photo-1523419409543-0c1df022bdd5?auto=format&fit=crop&w=800&q=80"
+        }
+      ]
+    },
+    {
+      "id": "creative-afternoon",
+      "title": "Creative Afternoon",
+      "cover": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80",
+      "photos": [
+        {
+          "id": "ca-1",
+          "title": "Studio time",
+          "url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+          "id": "ca-2",
+          "title": "Gallery hop",
+          "url": "https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+          "id": "ca-3",
+          "title": "Library lounge",
+          "url": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=800&q=80"
+        }
+      ]
+    },
+    {
+      "id": "night-lights",
+      "title": "Night Lights",
+      "cover": "https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=600&q=80",
+      "photos": [
+        {
+          "id": "nl-1",
+          "title": "Market arcade",
+          "url": "https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+          "id": "nl-2",
+          "title": "Rooftop lights",
+          "url": "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+          "id": "nl-3",
+          "title": "City reflections",
+          "url": "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=80"
+        }
+      ]
+    }
+  ]
+}

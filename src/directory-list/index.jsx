@@ -30,7 +30,7 @@ function App() {
             className="sm:w-18 w-16 aspect-square rounded-xl bg-cover bg-center"
             style={{
               backgroundImage:
-                "url(https://persistent.oaistatic.com/pizzaz/title.png)",
+                "url(https://images.unsplash.com/photo-1523419409543-0c1df022bdd5?auto=format&fit=crop&w=400&q=80)",
             }}
           ></div>
           <div>
@@ -40,7 +40,7 @@ function App() {
           <div className="flex-auto hidden sm:flex justify-end pr-2">
             <button
               type="button"
-              className="cursor-pointer inline-flex items-center rounded-full bg-[var(--directory-primary, #F46C21)] text-white px-4 py-1.5 sm:text-md text-sm font-medium hover:opacity-90 active:opacity-100"
+              className="cursor-pointer inline-flex items-center rounded-full bg-[var(--directory-primary, #2563EB)] text-white px-4 py-1.5 sm:text-md text-sm font-medium hover:opacity-90 active:opacity-100"
             >
               {primaryCta}
             </button>
@@ -68,7 +68,7 @@ function App() {
                         className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg object-cover ring ring-black/5"
                       />
                     ) : (
-                      <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg bg-[var(--directory-primary, #F46C21)]/10 text-[var(--directory-primary, #F46C21)] flex items-center justify-center font-semibold">
+                      <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg bg-[var(--directory-primary, #2563EB)]/10 text-[var(--directory-primary, #2563EB)] flex items-center justify-center font-semibold">
                         {place.title?.charAt(0) ?? "?"}
                       </div>
                     )}
@@ -118,7 +118,7 @@ function App() {
         <div className="sm:hidden px-0 pt-2 pb-2">
           <button
             type="button"
-            className="w-full cursor-pointer inline-flex items-center justify-center rounded-full bg-[var(--directory-primary, #F46C21)] text-white px-4 py-2 font-medium hover:opacity-90 active:opacity-100"
+            className="w-full cursor-pointer inline-flex items-center justify-center rounded-full bg-[var(--directory-primary, #2563EB)] text-white px-4 py-2 font-medium hover:opacity-90 active:opacity-100"
           >
             {primaryCta}
           </button>
@@ -128,4 +128,4 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("pizzaz-list-root")).render(<App />);
+createRoot(document.getElementById("directory-list-root")).render(<App />);

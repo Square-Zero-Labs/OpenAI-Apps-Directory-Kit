@@ -1,7 +1,7 @@
 {
-  "name": "ecosystem_ui",
+  "name": "openai-apps-directory-kit",
   "version": "5.0.16",
-  "description": "",
+  "description": "React widgets and an MCP server for building directory-style ChatGPT apps.",
   "main": "host/main.ts",
   "scripts": {
     "build": "tsx ./build-all.mts",

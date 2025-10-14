@@ -1,27 +1,29 @@
-import markers from "./pizzaz/markers.json";
+import markers from "./directory-map/markers.json";
 
 export const defaultDirectoryUi = {
   theme: {
-    primary: "#F46C21",
-    accent: "#0B6CF6",
-    background: "#FFFFFF"
+    primary: "#2563EB",
+    accent: "#10B981",
+    background: "#F8FAFC"
   },
   copy: {
-    appTitle: "Pizzaz",
-    listTitle: "National Best Pizza List",
-    listSubtitle: "A ranking of the best pizzerias in the world",
-    emptyState: "No spots found.",
-    primaryCtaLabel: "Save List",
-    secondaryCtaLabel: "Add to favorites",
+    appTitle: "Directory Demo",
+    listTitle: "City Highlights",
+    listSubtitle: "A shortlist of places locals love",
+    emptyState: "No places match yet.",
+    primaryCtaLabel: "Save Collection",
+    secondaryCtaLabel: "Bookmark",
     contactCtaLabel: "Contact",
-    inspectorLocationLabel: "San Francisco",
+    inspectorLocationLabel: "San Francisco Bay Area",
     filterLabel: "Filter",
-    detailFallback: "Enjoy a slice at one of SF's favorites.",
-    reviewsTitle: "Reviews",
+    detailFallback: "Explore the neighborhood highlights curated for your day.",
+    reviewsTitle: "Visitor notes",
     learnMoreLabel: "Learn more",
-    sampleReviewOne: "Fantastic crust and balanced toppings. The marinara is spot on!",
-    sampleReviewTwo: "Cozy vibe and friendly staff. Quick service on a Friday night.",
-    sampleReviewThree: "Great for sharing. Will definitely come back with friends."
+    sampleReviewOne:
+      "Welcoming hosts and thoughtful details throughout the experience.",
+    sampleReviewTwo: "Lots of small touches that make this spot a standout.",
+    sampleReviewThree:
+      "Easy to spend an afternoon here—I'll be bringing friends back."
   },
   fields: {
     title: "name",
@@ -39,6 +41,7 @@ export const defaultDirectoryUi = {
 };
 
 export const defaultStructuredContent = {
+  headline: "City highlights",
   items: markers.places ?? [],
   ui: defaultDirectoryUi
 };

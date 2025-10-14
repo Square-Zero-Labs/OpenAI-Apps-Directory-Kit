@@ -54,7 +54,7 @@ export default function App() {
     () => normalizeDirectoryItems(items, ui),
     [items, ui]
   );
-  const markerColor = ui.theme?.primary ?? "#F46C21";
+  const markerColor = ui.theme?.primary ?? "#2563EB";
   const markerCoords = useMemo(
     () =>
       normalizedPlaces
@@ -143,7 +143,7 @@ export default function App() {
     if (typeof window === "undefined") return 0;
     const isXlUp =
       window.matchMedia && window.matchMedia("(min-width: 1280px)").matches;
-    const el = document.querySelector(".pizzaz-inspector");
+    const el = document.querySelector(".directory-inspector");
     const w = el ? el.getBoundingClientRect().width : 360;
     const half = Math.round(w / 2);
     // xl: inspector on right → negative x offset; lg: inspector on left → positive x offset
@@ -310,7 +310,7 @@ function RouterRoot() {
   );
 }
 
-createRoot(document.getElementById("pizzaz-root")).render(
+createRoot(document.getElementById("directory-map-root")).render(
   <BrowserRouter>
     <RouterRoot />
   </BrowserRouter>

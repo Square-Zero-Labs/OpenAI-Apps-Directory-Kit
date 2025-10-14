@@ -13,7 +13,7 @@ export default function PlaceCard({ place, ui }) {
             className="w-full aspect-square rounded-2xl object-cover ring ring-black/5 shadow-[0px_2px_6px_rgba(0,0,0,0.06)]"
           />
         ) : (
-          <div className="w-full aspect-square rounded-2xl bg-[var(--directory-primary, #F46C21)]/10 text-[var(--directory-primary, #F46C21)] flex items-center justify-center text-3xl font-semibold">
+          <div className="w-full aspect-square rounded-2xl bg-[var(--directory-primary, #2563EB)]/10 text-[var(--directory-primary, #2563EB)] flex items-center justify-center text-3xl font-semibold">
             {place.title?.charAt(0) ?? "?"}
           </div>
         )}
@@ -38,7 +38,7 @@ export default function PlaceCard({ place, ui }) {
         <div className="mt-5">
           <button
             type="button"
-            className="cursor-pointer inline-flex items-center rounded-full bg-[var(--directory-primary, #F46C21)] text-white px-4 py-1.5 text-sm font-medium hover:opacity-90 active:opacity-100"
+            className="cursor-pointer inline-flex items-center rounded-full bg-[var(--directory-primary, #2563EB)] text-white px-4 py-1.5 text-sm font-medium hover:opacity-90 active:opacity-100"
           >
             {ui?.copy?.learnMoreLabel ?? "Learn more"}
           </button>

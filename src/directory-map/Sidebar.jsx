@@ -28,7 +28,7 @@ function PlaceListItem({ place, isSelected, onClick }) {
               className="h-16 w-16 rounded-lg object-cover flex-none"
             />
           ) : (
-            <div className="h-16 w-16 rounded-lg bg-[var(--directory-primary, #F46C21)]/10 flex items-center justify-center text-[var(--directory-primary, #F46C21)] font-semibold">
+            <div className="h-16 w-16 rounded-lg bg-[var(--directory-primary, #2563EB)]/10 flex items-center justify-center text-[var(--directory-primary, #2563EB)] font-semibold">
               {place.title?.[0] ?? "?"}
             </div>
           )}

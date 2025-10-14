@@ -1,9 +1,9 @@
 {
-  "name": "pizzaz-mcp-node",
+  "name": "directory-mcp-node",
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "description": "Example MCP server that exposes the Pizzaz demo tools using the official TypeScript SDK.",
+  "description": "Configurable directory MCP server for the OpenAI Apps Directory Kit.",
   "scripts": {
     "start": "tsx src/server.ts",
     "typecheck": "tsc --project tsconfig.json --noEmit",

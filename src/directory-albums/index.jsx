@@ -2,20 +2,14 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import PlaceCard from "./PlaceCard";
-import { useWidgetProps } from "../use-widget-props";
-import {
-  defaultStructuredContent,
-  defaultDirectoryUi,
-} from "../directory-defaults";
-import { normalizeDirectoryItems, themeStyleVars } from "../directory-utils";
+import albumsData from "./albums.json";
+import { useMaxHeight } from "../use-max-height";
+import { useOpenAiGlobal } from "../use-openai-global";
+import FullscreenViewer from "./FullscreenViewer";
+import AlbumCard from "./AlbumCard";
 
-function App() {
-  const widgetProps = useWidgetProps(() => defaultStructuredContent);
-  const items = widgetProps?.items ?? defaultStructuredContent.items;
-  const ui = widgetProps?.ui ?? defaultDirectoryUi;
-  const themeVars = themeStyleVars(ui.theme);
-  const places = normalizeDirectoryItems(items, ui);
+function AlbumsCarousel({ onSelect }) {
+  const albums = albumsData?.albums || [];
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
     loop: false,
@@ -42,18 +36,14 @@ function App() {
   }, [emblaApi]);
 
   return (
-    <div
-      className="antialiased relative w-full text-black py-5 bg-white"
-      style={themeVars}
-    >
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex gap-4 max-sm:mx-5 items-stretch">
-          {places.map((place) => (
-            <PlaceCard key={place.id} place={place} ui={ui} />
+    <div className="antialiased relative w-full text-black py-5 select-none">
+      <div className="overflow-hidden max-sm:mx-5" ref={emblaRef}>
+        <div className="flex gap-5 items-stretch">
+          {albums.map((album) => (
+            <AlbumCard key={album.id} album={album} onSelect={onSelect} />
           ))}
         </div>
       </div>
-      {/* Edge gradients */}
       <div
         aria-hidden
         className={
@@ -120,4 +110,35 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("pizzaz-carousel-root")).render(<App />);
+function App() {
+  const displayMode = useOpenAiGlobal("displayMode");
+  const [selectedAlbum, setSelectedAlbum] = React.useState(null);
+  const maxHeight = useMaxHeight() ?? undefined;
+
+  const handleSelectAlbum = (album) => {
+    setSelectedAlbum(album);
+    if (window?.webplus?.requestDisplayMode) {
+      window.webplus.requestDisplayMode({ mode: "fullscreen" });
+    }
+  };
+
+  return (
+    <div
+      className="relative antialiased w-full"
+      style={{
+        maxHeight,
+        height: displayMode === "fullscreen" ? maxHeight : undefined,
+      }}
+    >
+      {displayMode !== "fullscreen" && (
+        <AlbumsCarousel onSelect={handleSelectAlbum} />
+      )}
+
+      {displayMode === "fullscreen" && selectedAlbum && (
+        <FullscreenViewer album={selectedAlbum} />
+      )}
+    </div>
+  );
+}
+
+createRoot(document.getElementById("directory-albums-root")).render(<App />);

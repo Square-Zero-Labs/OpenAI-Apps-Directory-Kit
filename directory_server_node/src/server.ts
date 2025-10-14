@@ -79,7 +79,7 @@ type WidgetDefinition = {
   responseText: string;
 };
 
-type PizzazWidget = WidgetDefinition & {
+type DirectoryWidget = WidgetDefinition & {
   templateUri: string;
   cssVariant: string;
   jsVariant: string;
@@ -107,7 +107,7 @@ function resolveAssetVariant(assetPath: string): string {
   if (existsSync(directUrl)) {
     assetVariantCache.set(normalized, normalized);
     console.log(
-      `[pizzaz] resolveAssetVariant hit direct file "${normalized}" -> ${directUrl.href}`
+      `[directory] resolveAssetVariant hit direct file "${normalized}" -> ${directUrl.href}`
     );
     return normalized;
   }
@@ -155,7 +155,7 @@ function resolveAssetVariant(assetPath: string): string {
   const resolved = directory ? `${directory}/${match}` : match;
   assetVariantCache.set(normalized, resolved);
   console.log(
-    `[pizzaz] resolveAssetVariant mapped "${normalized}" -> "${resolved}"`
+    `[directory] resolveAssetVariant mapped "${normalized}" -> "${resolved}"`
   );
   return resolved;
 }
@@ -165,7 +165,7 @@ const directoryConfig: DirectoryConfig = JSON.parse(
 );
 
 const fallbackData: { items: DirectoryItem[] } = JSON.parse(
-  readFileSync(new URL("./data/pizzaz-places.json", serverRoot), "utf8")
+  readFileSync(new URL("./data/directory-places.json", serverRoot), "utf8")
 );
 
 const directoryUi = {
@@ -285,7 +285,7 @@ async function fetchDirectoryItems(
   });
 }
 
-function widgetMeta(widget: PizzazWidget) {
+function widgetMeta(widget: DirectoryWidget) {
   return {
     "openai/outputTemplate": widget.templateUri,
     "openai/toolInvocation/invoking": widget.invoking,
@@ -295,14 +295,14 @@ function widgetMeta(widget: PizzazWidget) {
   } as const;
 }
 
-console.log(`[pizzaz] Local assets directory: ${assetsRootUrl.href}`);
+console.log(`[directory] Local assets directory: ${assetsRootUrl.href}`);
 
 function extractAssetRevision(asset: string): string | null {
   const match = asset.match(/-([a-z0-9]+)\.[^.]+$/i);
   return match?.[1] ?? null;
 }
 
-function instantiateWidget(def: WidgetDefinition): PizzazWidget {
+function instantiateWidget(def: WidgetDefinition): DirectoryWidget {
   let cssVariant = def.cssAsset;
   let jsVariant = def.jsAsset;
   let cssText = "";
@@ -341,11 +341,11 @@ function instantiateWidget(def: WidgetDefinition): PizzazWidget {
   };
 }
 
-function buildWidgetHtml(widget: PizzazWidget) {
+function buildWidgetHtml(widget: DirectoryWidget) {
   const cssInline = widget.cssText;
   const jsInline = widget.jsText.replace(/<\/script/gi, "<\\/script");
   console.log(
-    `[pizzaz] widget ${widget.id} embedded assets css=${widget.cssVariant} js=${widget.jsVariant}`
+    `[directory] widget ${widget.id} embedded assets css=${widget.cssVariant} js=${widget.jsVariant}`
   );
 
   return `
@@ -361,57 +361,56 @@ function warmupWidgetAssets() {
   try {
     const { widgets } = ensureWidgetState();
     widgets.forEach((widget) => {
-      // Build HTML once so asset URLs/logs are visible at startup.
       buildWidgetHtml(widget);
     });
   } catch (error) {
-    console.warn("[pizzaz] Widget warmup failed", error);
+    console.warn("[directory] Widget warmup failed", error);
   }
 }
 
 const widgetDefinitions: WidgetDefinition[] = [
   {
-    id: "pizza-map",
+    id: "directory-map",
     title: "Show Directory Map",
     templateUriBase: "ui://widget/directory-map.html",
     invoking: "Mapping the directory",
     invoked: "Rendered the directory map",
-    rootId: "pizzaz-root",
-    cssAsset: "pizzaz.css",
-    jsAsset: "pizzaz.js",
+    rootId: "directory-map-root",
+    cssAsset: "directory-map.css",
+    jsAsset: "directory-map.js",
     responseText: "Rendered a directory map!"
   },
   {
-    id: "pizza-list",
+    id: "directory-list",
     title: "Show Directory List",
     templateUriBase: "ui://widget/directory-list.html",
     invoking: "Listing directory items",
     invoked: "Rendered the directory list",
-    rootId: "pizzaz-list-root",
-    cssAsset: "pizzaz-list.css",
-    jsAsset: "pizzaz-list.js",
+    rootId: "directory-list-root",
+    cssAsset: "directory-list.css",
+    jsAsset: "directory-list.js",
     responseText: "Rendered a directory list!"
   },
   {
-    id: "pizza-carousel",
+    id: "directory-carousel",
     title: "Show Directory Carousel",
     templateUriBase: "ui://widget/directory-carousel.html",
     invoking: "Carousel some items",
     invoked: "Rendered the directory carousel",
-    rootId: "pizzaz-carousel-root",
-    cssAsset: "pizzaz-carousel.css",
-    jsAsset: "pizzaz-carousel.js",
+    rootId: "directory-carousel-root",
+    cssAsset: "directory-carousel.css",
+    jsAsset: "directory-carousel.js",
     responseText: "Rendered a directory carousel!"
   },
   {
-    id: "pizza-albums",
+    id: "directory-albums",
     title: "Show Directory Album",
     templateUriBase: "ui://widget/directory-albums.html",
-    invoking: "Hand-tossing an album",
+    invoking: "Rendering the directory album",
     invoked: "Rendered the directory album",
-    rootId: "pizzaz-albums-root",
-    cssAsset: "pizzaz-albums.css",
-    jsAsset: "pizzaz-albums.js",
+    rootId: "directory-albums-root",
+    cssAsset: "directory-albums.css",
+    jsAsset: "directory-albums.js",
     responseText: "Rendered a directory album!"
   }
 ];
@@ -419,9 +418,9 @@ const widgetDefinitions: WidgetDefinition[] = [
 const toolInputSchema = {
   type: "object",
   properties: {
-    pizzaTopping: {
+    headline: {
       type: "string",
-      description: "Topping to mention when rendering the widget."
+      description: "Short headline to include with the rendered widget."
     },
     location: {
       type: "string",
@@ -438,20 +437,20 @@ const toolInputSchema = {
       ]
     }
   },
-  required: ["pizzaTopping"],
+  required: ["headline"],
   additionalProperties: false
 } as const;
 
 const toolInputParser = z.object({
-  pizzaTopping: z.string(),
+  headline: z.string(),
   location: z.string().optional(),
   attribute: z.union([z.string(), z.array(z.string())]).optional()
 });
 
 type WidgetState = {
-  widgets: PizzazWidget[];
-  widgetsById: Map<string, PizzazWidget>;
-  widgetsByUri: Map<string, PizzazWidget>;
+  widgets: DirectoryWidget[];
+  widgetsById: Map<string, DirectoryWidget>;
+  widgetsByUri: Map<string, DirectoryWidget>;
   tools: Tool[];
   resources: Resource[];
   resourceTemplates: ResourceTemplate[];
@@ -461,8 +460,8 @@ let widgetStateCache: WidgetState | null = null;
 
 function buildWidgetState(): WidgetState {
   const widgets = widgetDefinitions.map(instantiateWidget);
-  const widgetsById = new Map<string, PizzazWidget>();
-  const widgetsByUri = new Map<string, PizzazWidget>();
+  const widgetsById = new Map<string, DirectoryWidget>();
+  const widgetsByUri = new Map<string, DirectoryWidget>();
 
   widgets.forEach((widget) => {
     widgetsById.set(widget.id, widget);
@@ -512,10 +511,10 @@ function ensureWidgetState(): WidgetState {
 
 warmupWidgetAssets();
 
-function createPizzazServer(): Server {
+function createDirectoryServer(): Server {
   const server = new Server(
     {
-      name: "pizzaz-node",
+      name: "directory-node",
       version: "0.2.0"
     },
     {
@@ -583,7 +582,7 @@ function createPizzazServer(): Server {
         }
       ],
       structuredContent: {
-        pizzaTopping: args.pizzaTopping,
+        headline: args.headline,
         items,
         ui: directoryUi,
         directory: {
@@ -614,15 +613,15 @@ const postPath = "/mcp/messages";
 
 async function handleSseRequest(res: ServerResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  const server = createPizzazServer();
+  const server = createDirectoryServer();
   const transport = new SSEServerTransport(postPath, res);
   const sessionId = transport.sessionId;
-  console.log(`[pizzaz] Opening SSE session ${sessionId}`);
+  console.log(`[directory] Opening SSE session ${sessionId}`);
 
   sessions.set(sessionId, { server, transport });
 
   transport.onclose = async () => {
-    console.log(`[pizzaz] SSE session ${sessionId} closed`);
+    console.log(`[directory] SSE session ${sessionId} closed`);
     sessions.delete(sessionId);
     await server.close();
   };
@@ -657,7 +656,7 @@ async function handlePostMessage(
   }
 
   const session = sessions.get(sessionId);
-  console.log(`[pizzaz] POST /mcp/messages for session ${sessionId}`);
+  console.log(`[directory] POST /mcp/messages for session ${sessionId}`);
 
   if (!session) {
     res.writeHead(404).end("Unknown session");
@@ -724,7 +723,7 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
       }
       res.setHeader("Access-Control-Allow-Origin", "*");
       console.log(
-        `[pizzaz] Served asset "${assetPath}" as "${resolvedName}" (${contentType ?? "no content-type"})`
+        `[directory] Served asset "${assetPath}" as "${resolvedName}" (${contentType ?? "no content-type"})`
       );
       res.writeHead(200);
       if (req.method === "HEAD") {
@@ -749,7 +748,7 @@ httpServer.on("clientError", (err: Error, socket) => {
 });
 
 httpServer.listen(port, () => {
-  console.log(`Pizzaz MCP server listening on http://localhost:${port}`);
+  console.log(`Directory MCP server listening on http://localhost:${port}`);
   console.log(`  SSE stream: GET http://localhost:${port}${ssePath}`);
   console.log(`  Message post endpoint: POST http://localhost:${port}${postPath}?sessionId=...`);
   console.log(`  Assets: GET http://localhost:${port}/assets/<file>`);

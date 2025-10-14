@@ -1,0 +1,84 @@
+{
+  "places": [
+    {
+      "id": "harbor-and-pine",
+      "name": "Harbor & Pine Coffeehouse",
+      "coords": [-122.4105, 37.8008],
+      "description": "Sunlit cafe with rotating micro-roasters and roomy communal tables.",
+      "city": "North Beach",
+      "rating": 4.8,
+      "price": "$$",
+      "thumbnail": "https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "id": "gallery-mercantile",
+      "name": "Gallery Mercantile",
+      "coords": [-122.4028, 37.7973],
+      "description": "Indie art gallery with local makers and Friday salon nights.",
+      "city": "Jackson Square",
+      "rating": 4.7,
+      "price": "$$",
+      "thumbnail": "https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "id": "skyline-lookout",
+      "name": "Skyline Lookout Terrace",
+      "coords": [-122.4012, 37.7915],
+      "description": "Glass rooftop lounge with 360° views and seasonal mocktails.",
+      "city": "Downtown",
+      "rating": 4.6,
+      "price": "$$$",
+      "thumbnail": "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "id": "maker-lane-studio",
+      "name": "Maker Lane Studio",
+      "coords": [-122.4065, 37.7802],
+      "description": "Hands-on workshop for ceramics, textiles, and screen printing.",
+      "city": "SoMa",
+      "rating": 4.5,
+      "price": "$$",
+      "thumbnail": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "id": "bay-trail-commons",
+      "name": "Bay Trail Commons",
+      "coords": [-122.3919, 37.7989],
+      "description": "Waterfront park with pop-up markets and weekend yoga.",
+      "city": "Embarcadero",
+      "rating": 4.6,
+      "price": "$",
+      "thumbnail": "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "id": "lumen-reading-room",
+      "name": "Lumen Reading Room",
+      "coords": [-122.4362, 37.7924],
+      "description": "Quiet library lounge with floor-to-ceiling stacks and tea service.",
+      "city": "Pacific Heights",
+      "rating": 4.7,
+      "price": "$$",
+      "thumbnail": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "id": "evening-market-arcade",
+      "name": "Evening Market Arcade",
+      "coords": [-122.4192, 37.7603],
+      "description": "Late-night food hall featuring small batch vendors and live sets.",
+      "city": "Mission District",
+      "rating": 4.5,
+      "price": "$$",
+      "thumbnail": "https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "id": "sunset-conservatory",
+      "name": "Sunset Conservatory",
+      "coords": [-122.4855, 37.7593],
+      "description": "Greenhouse-inspired workspace filled with greenery and natural light.",
+      "city": "Sunset",
+      "rating": 4.4,
+      "price": "$$",
+      "thumbnail": "https://images.unsplash.com/photo-1523419409543-0c1df022bdd5?auto=format&fit=crop&w=400&q=80"
+    }
+  ]
+}
