@@ -16,7 +16,6 @@ function App() {
   const places = normalizeDirectoryItems(items, ui);
   const listTitle = ui.copy?.listTitle ?? "Directory List";
   const listSubtitle = ui.copy?.listSubtitle ?? "Curated directory entries";
-  const primaryCta = ui.copy?.primaryCtaLabel ?? "Save List";
   const emptyState = ui.copy?.emptyState ?? "No locations found.";
 
   return (
@@ -37,14 +36,7 @@ function App() {
             <div className="text-base sm:text-xl font-medium">{listTitle}</div>
             <div className="text-sm text-black/60">{listSubtitle}</div>
           </div>
-          <div className="flex-auto hidden sm:flex justify-end pr-2">
-            <button
-              type="button"
-              className="cursor-pointer inline-flex items-center rounded-full bg-[var(--directory-primary, #2563EB)] text-white px-4 py-1.5 sm:text-md text-sm font-medium hover:opacity-90 active:opacity-100"
-            >
-              {primaryCta}
-            </button>
-          </div>
+          <div className="flex-auto hidden sm:flex justify-end pr-2" />
         </div>
         <div className="min-w-full text-sm flex flex-col">
           {places.slice(0, 7).map((place, i) => (
@@ -115,14 +107,7 @@ function App() {
             </div>
           )}
         </div>
-        <div className="sm:hidden px-0 pt-2 pb-2">
-          <button
-            type="button"
-            className="w-full cursor-pointer inline-flex items-center justify-center rounded-full bg-[var(--directory-primary, #2563EB)] text-white px-4 py-2 font-medium hover:opacity-90 active:opacity-100"
-          >
-            {primaryCta}
-          </button>
-        </div>
+        <div className="sm:hidden px-0 pt-2 pb-2" />
       </div>
     </div>
   );

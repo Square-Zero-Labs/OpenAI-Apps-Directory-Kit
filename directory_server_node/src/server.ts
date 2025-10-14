@@ -30,6 +30,7 @@ type DirectoryConfig = {
   fields?: Record<string, string>;
   filters?: {
     locationField?: string;
+    locationFields?: string[];
     attributeField?: string;
   };
   map?: {
@@ -225,8 +226,21 @@ async function fetchDirectoryItems(
 
         const filterConfig = directoryConfig.filters ?? {};
         const locationFilter = filters?.location?.trim();
-        if (locationFilter && filterConfig.locationField) {
-          query.ilike(filterConfig.locationField, `%${locationFilter}%`);
+        const locationFields =
+          Array.isArray(filterConfig.locationFields) && filterConfig.locationFields.length > 0
+            ? filterConfig.locationFields
+            : filterConfig.locationField
+              ? [filterConfig.locationField]
+              : [];
+        if (locationFilter && locationFields.length > 0) {
+          if (locationFields.length === 1) {
+            query.ilike(locationFields[0], `%${locationFilter}%`);
+          } else {
+            const orClause = locationFields
+              .map((field) => `${field}.ilike.%${locationFilter}%`)
+              .join(",");
+            query.or(orClause);
+          }
         }
 
         const attributeFilter = filters?.attribute;
@@ -260,14 +274,22 @@ async function fetchDirectoryItems(
 
   const filterConfig = directoryConfig.filters ?? {};
   const locationFilter = filters?.location?.trim()?.toLowerCase();
+  const locationFields =
+    Array.isArray(filterConfig.locationFields) && filterConfig.locationFields.length > 0
+      ? filterConfig.locationFields
+      : filterConfig.locationField
+        ? [filterConfig.locationField]
+        : [];
   const attributeFilter = filters?.attribute;
 
   return fallbackData.items.filter((item) => {
     let matchesLocation = true;
-    if (locationFilter && filterConfig.locationField) {
-      const value = getValueAtPath(item, filterConfig.locationField) ?? item[filterConfig.locationField];
-      const valueString = value != null ? String(value).toLowerCase() : "";
-      matchesLocation = valueString.includes(locationFilter);
+    if (locationFilter && locationFields.length > 0) {
+      matchesLocation = locationFields.some((field) => {
+        const value = getValueAtPath(item, field) ?? (item as Record<string, unknown>)[field];
+        const valueString = value != null ? String(value).toLowerCase() : "";
+        return valueString.includes(locationFilter);
+      });
     }
 
     let matchesAttribute = true;

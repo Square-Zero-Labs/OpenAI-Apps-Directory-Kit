@@ -53,14 +53,6 @@ export default function Inspector({ place, onClose, ui }) {
               {place.price ? <span>· {place.price}</span> : null}
               {locationLabel ? <span>· {locationLabel}</span> : null}
             </div>
-            <div className="mt-3 flex flex-row items-center gap-3 font-medium">
-              <div className="rounded-full bg-[var(--directory-primary, #2563EB)] text-white cursor-pointer px-4 py-1.5">
-                {ui?.copy?.secondaryCtaLabel ?? "Bookmark"}
-              </div>
-              <div className="rounded-full border border-[var(--directory-primary, #2563EB)]/50 text-[var(--directory-primary, #2563EB)] cursor-pointer  px-4 py-1.5">
-                {ui?.copy?.contactCtaLabel ?? "Contact"}
-              </div>
-            </div>
             <div className="text-sm mt-5">
               {place.description ??
                 ui?.copy?.detailFallback ??

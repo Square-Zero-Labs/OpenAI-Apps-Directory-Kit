@@ -11,28 +11,26 @@
     "listTitle": "City Highlights",
     "listSubtitle": "A shortlist of places locals love",
     "emptyState": "No places match yet.",
-    "primaryCtaLabel": "Save Collection",
-    "secondaryCtaLabel": "Bookmark",
-    "contactCtaLabel": "Contact",
     "inspectorLocationLabel": "San Francisco Bay Area",
     "filterLabel": "Filter",
     "detailFallback": "Explore the neighborhood highlights curated for your day.",
     "reviewsTitle": "Visitor notes",
-    "learnMoreLabel": "Learn more",
-    "sampleReviewOne": "Welcoming hosts and thoughtful details throughout the experience.",
-    "sampleReviewTwo": "Lots of small touches that make this spot a standout.",
-    "sampleReviewThree": "Easy to spend an afternoon here—I'll be bringing friends back."
+    "learnMoreLabel": "Learn more"
   },
   "fields": {
     "title": "name",
-    "subtitle": "city",
+    "subtitle": "neighborhood",
     "description": "description",
     "rating": "rating",
     "price": "price",
-    "thumbnail": "thumbnail"
+    "thumbnail": "thumbnail",
+    "address": "address",
+    "city": "city",
+    "region": "region",
+    "neighborhood": "neighborhood"
   },
   "filters": {
-    "locationField": "city",
+    "locationFields": ["city", "neighborhood"],
     "attributeField": "price"
   },
   "map": {
@@ -45,7 +43,7 @@
     "url": "https://your-project.supabase.co",
     "serviceKeyEnv": "SUPABASE_SERVICE_ROLE_KEY",
     "table": "directory_places",
-    "select": "id,name,description,city,rating,price,coords,thumbnail",
+    "select": "id,name,description,address,city,region,neighborhood,rating,price,coords,thumbnail",
     "orderBy": {
       "column": "rating",
       "ascending": false
