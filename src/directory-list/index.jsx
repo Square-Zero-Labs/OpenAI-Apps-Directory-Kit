@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { PlusCircle, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { useWidgetProps } from "../use-widget-props";
 import {
   defaultStructuredContent,
@@ -103,8 +103,8 @@ function App() {
                 <div className="hidden sm:block text-end py-2 px-3 text-sm text-black/60 whitespace-nowrap flex-auto">
                   {place.subtitle || "–"}
                 </div>
-                <div className="py-2 whitespace-nowrap flex justify-end">
-                  <PlusCircle strokeWidth={1.5} className="h-5 w-5" />
+                <div className="py-2 whitespace-nowrap flex justify-end text-sm text-black/60">
+                  {place.price ? <span>{place.price}</span> : <span>Details</span>}
                 </div>
               </div>
             </div>

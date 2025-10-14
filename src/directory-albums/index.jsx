@@ -114,28 +114,54 @@ function App() {
   const displayMode = useOpenAiGlobal("displayMode");
   const [selectedAlbum, setSelectedAlbum] = React.useState(null);
   const maxHeight = useMaxHeight() ?? undefined;
+  const isFullscreen = displayMode === "fullscreen";
 
-  const handleSelectAlbum = (album) => {
-    setSelectedAlbum(album);
-    if (window?.webplus?.requestDisplayMode) {
-      window.webplus.requestDisplayMode({ mode: "fullscreen" });
+  const handleSelectAlbum = React.useCallback(
+    (album) => {
+      setSelectedAlbum(album);
+      const requestDisplayMode = window?.webplus?.requestDisplayMode;
+      if (!isFullscreen && requestDisplayMode) {
+        requestDisplayMode({ mode: "fullscreen" }).catch?.(() => {});
+      }
+    },
+    [isFullscreen]
+  );
+
+  const handleCloseAlbum = React.useCallback(() => {
+    setSelectedAlbum(null);
+    const requestDisplayMode = window?.webplus?.requestDisplayMode;
+    if (isFullscreen && requestDisplayMode) {
+      requestDisplayMode({ mode: "embedded" }).catch?.(() => {});
     }
-  };
+  }, [isFullscreen]);
+
+  const overlayActive = Boolean(selectedAlbum);
 
   return (
     <div
       className="relative antialiased w-full"
       style={{
         maxHeight,
-        height: displayMode === "fullscreen" ? maxHeight : undefined,
+        height: isFullscreen ? maxHeight : undefined,
       }}
     >
-      {displayMode !== "fullscreen" && (
-        <AlbumsCarousel onSelect={handleSelectAlbum} />
+      <AlbumsCarousel onSelect={handleSelectAlbum} />
+
+      {overlayActive && (
+        <FullscreenViewer
+          album={selectedAlbum}
+          onClose={handleCloseAlbum}
+          fullscreen={isFullscreen}
+        />
       )}
 
-      {displayMode === "fullscreen" && selectedAlbum && (
-        <FullscreenViewer album={selectedAlbum} />
+      {!isFullscreen && overlayActive && (
+        <button
+          type="button"
+          className="absolute inset-0 z-20 bg-black/10 backdrop-blur-sm"
+          onClick={handleCloseAlbum}
+          aria-label="Dismiss album"
+        />
       )}
     </div>
   );

@@ -1,9 +1,19 @@
 import React from "react";
 
 export default function FilmStrip({ album, selectedIndex, onSelect }) {
+  const photos = album?.photos ?? [];
+
+  if (photos.length === 0) {
+    return (
+      <div className="h-full w-full flex items-center justify-center text-sm text-black/50">
+        No photos available
+      </div>
+    );
+  }
+
   return (
     <div className="h-full w-full overflow-auto flex flex-col items-center justify-center p-5 space-y-5">
-      {album.photos.map((photo, idx) => (
+      {photos.map((photo, idx) => (
         <button
           key={photo.id}
           type="button"
