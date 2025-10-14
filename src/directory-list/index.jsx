@@ -16,6 +16,7 @@ function App() {
   const places = normalizeDirectoryItems(items, ui);
   const listTitle = ui.copy?.listTitle ?? "Directory List";
   const listSubtitle = ui.copy?.listSubtitle ?? "Curated directory entries";
+  const logoUrl = ui.branding?.logoUrl ?? null;
   const emptyState = ui.copy?.emptyState ?? "No locations found.";
 
   return (
@@ -25,13 +26,20 @@ function App() {
     >
       <div className="max-w-full">
         <div className="flex flex-row items-center gap-4 sm:gap-4 border-b border-black/5 py-4">
-          <div
-            className="sm:w-18 w-16 aspect-square rounded-xl bg-cover bg-center"
-            style={{
-              backgroundImage:
-                "url(https://images.unsplash.com/photo-1523419409543-0c1df022bdd5?auto=format&fit=crop&w=400&q=80)",
-            }}
-          ></div>
+          {logoUrl ? (
+            <div className="sm:w-18 w-16 aspect-square rounded-xl overflow-hidden border border-black/10">
+              <img
+                src={logoUrl}
+                alt={ui.copy?.appTitle ?? "Directory logo"}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          ) : (
+            <div className="sm:w-18 w-16 aspect-square rounded-xl bg-[var(--directory-primary, #2563EB)]/10 text-[var(--directory-primary, #2563EB)] flex items-center justify-center font-semibold">
+              {(ui.copy?.appTitle ?? "Directory").charAt(0)}
+            </div>
+          )}
           <div>
             <div className="text-base sm:text-xl font-medium">{listTitle}</div>
             <div className="text-sm text-black/60">{listSubtitle}</div>

@@ -17,6 +17,9 @@
     "reviewsTitle": "Visitor notes",
     "learnMoreLabel": "Learn more"
   },
+  "branding": {
+    "logoUrl": "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=180&q=80"
+  },
   "fields": {
     "title": "name",
     "subtitle": "neighborhood",

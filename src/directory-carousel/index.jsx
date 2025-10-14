@@ -16,6 +16,7 @@ function App() {
   const ui = widgetProps?.ui ?? defaultDirectoryUi;
   const themeVars = themeStyleVars(ui.theme);
   const places = normalizeDirectoryItems(items, ui);
+  const logoUrl = ui.branding?.logoUrl ?? null;
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
     loop: false,
@@ -46,6 +47,26 @@ function App() {
       className="antialiased relative w-full text-black py-5 bg-white"
       style={themeVars}
     >
+      <div className="flex items-center justify-between px-4 pb-3">
+        <div>
+          <div className="text-lg font-semibold">
+            {ui.copy?.listTitle ?? ui.copy?.appTitle ?? "Highlights"}
+          </div>
+          <div className="text-sm text-black/60">
+            {ui.copy?.listSubtitle ?? null}
+          </div>
+        </div>
+        {logoUrl && (
+          <div className="h-10 w-10 rounded-lg overflow-hidden border border-black/10 flex-shrink-0">
+            <img
+              src={logoUrl}
+              alt={ui.copy?.appTitle ?? "Directory logo"}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        )}
+      </div>
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex gap-4 max-sm:mx-5 items-stretch">
           {places.map((place) => (

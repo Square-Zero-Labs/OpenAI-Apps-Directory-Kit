@@ -27,6 +27,9 @@ type DirectoryConfig = {
   slug: string;
   theme?: Record<string, string>;
   copy?: Record<string, string>;
+  branding?: {
+    logoUrl?: string;
+  };
   fields?: Record<string, string>;
   filters?: {
     locationField?: string;
@@ -176,7 +179,8 @@ const directoryUi = {
   theme: directoryConfig.theme ?? {},
   copy: directoryConfig.copy ?? {},
   fields: directoryConfig.fields ?? {},
-  map: directoryConfig.map ?? {}
+  map: directoryConfig.map ?? {},
+  branding: directoryConfig.branding ?? {}
 };
 
 let supabaseClient: SupabaseClient | null = null;

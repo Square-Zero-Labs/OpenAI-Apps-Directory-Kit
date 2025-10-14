@@ -33,6 +33,9 @@ export const defaultDirectoryUi = {
     latitudeField: "coords.1",
     longitudeField: "coords.0",
     defaultZoom: 12
+  },
+  branding: {
+    logoUrl: "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=180&q=80"
   }
 };
 
