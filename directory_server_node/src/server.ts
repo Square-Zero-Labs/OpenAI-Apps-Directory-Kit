@@ -32,6 +32,8 @@ type DirectoryConfig = {
     locationField?: string;
     locationFields?: string[];
     attributeField?: string;
+    priceField?: string;
+    ratingField?: string;
   };
   map?: {
     latitudeField?: string;
@@ -40,8 +42,7 @@ type DirectoryConfig = {
   };
   dataSource?: {
     type: "supabase";
-    url: string;
-    serviceKeyEnv: string;
+    url?: string;
     table: string;
     select?: string;
     orderBy?: {
@@ -65,7 +66,8 @@ function hasStringId(value: unknown): value is DirectoryItem {
 
 type DirectoryFilterInput = {
   location?: string | null;
-  attribute?: string | string[] | null;
+  price?: string | string[] | null;
+  minRating?: number | null;
 };
 
 type WidgetDefinition = {
@@ -203,16 +205,23 @@ async function fetchDirectoryItems(
   const dataSource = directoryConfig.dataSource;
 
   if (dataSource?.type === "supabase") {
-    const serviceKey = process.env[dataSource.serviceKeyEnv];
+    const supabaseUrl = process.env.SUPABASE_URL ?? dataSource.url;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!serviceKey) {
+    if (!supabaseUrl || !serviceKey) {
+      const missingParts = [
+        !supabaseUrl ? "Supabase URL" : null,
+        !serviceKey ? "service role key" : null
+      ]
+        .filter(Boolean)
+        .join(" and ");
       console.warn(
-        `Supabase key missing for env "${dataSource.serviceKeyEnv}". Falling back to bundled data.`
+        `Supabase configuration missing (${missingParts}). Falling back to bundled data.`
       );
     } else {
       try {
         if (!supabaseClient) {
-          supabaseClient = createClient(dataSource.url, serviceKey, {
+          supabaseClient = createClient(supabaseUrl, serviceKey, {
             auth: {
               persistSession: false,
               autoRefreshToken: false
@@ -243,13 +252,19 @@ async function fetchDirectoryItems(
           }
         }
 
-        const attributeFilter = filters?.attribute;
-        if (attributeFilter && filterConfig.attributeField) {
-          if (Array.isArray(attributeFilter)) {
-            query.in(filterConfig.attributeField, attributeFilter);
+        const priceField = filterConfig.priceField ?? filterConfig.attributeField;
+        const priceFilter = filters?.price;
+        if (priceFilter && priceField) {
+          if (Array.isArray(priceFilter)) {
+            query.in(priceField, priceFilter);
           } else {
-            query.eq(filterConfig.attributeField, attributeFilter);
+            query.eq(priceField, priceFilter);
           }
+        }
+
+        const ratingFilter = filters?.minRating;
+        if (typeof ratingFilter === "number" && filterConfig.ratingField) {
+          query.gte(filterConfig.ratingField, ratingFilter);
         }
 
         if (dataSource.orderBy?.column) {
@@ -280,7 +295,9 @@ async function fetchDirectoryItems(
       : filterConfig.locationField
         ? [filterConfig.locationField]
         : [];
-  const attributeFilter = filters?.attribute;
+  const priceField = filterConfig.priceField ?? filterConfig.attributeField;
+  const priceFilter = filters?.price;
+  const ratingFilter = filters?.minRating;
 
   return fallbackData.items.filter((item) => {
     let matchesLocation = true;
@@ -292,18 +309,29 @@ async function fetchDirectoryItems(
       });
     }
 
-    let matchesAttribute = true;
-    if (attributeFilter && filterConfig.attributeField) {
-      const value = getValueAtPath(item, filterConfig.attributeField) ?? item[filterConfig.attributeField];
-      if (Array.isArray(attributeFilter)) {
-        matchesAttribute =
-          value != null && attributeFilter.includes(String(value));
+    let matchesPrice = true;
+    if (priceFilter && priceField) {
+      const value = getValueAtPath(item, priceField) ?? (item as Record<string, unknown>)[priceField];
+      if (Array.isArray(priceFilter)) {
+        matchesPrice = value != null && priceFilter.includes(String(value));
       } else {
-        matchesAttribute = value != null && String(value) === String(attributeFilter);
+        matchesPrice = value != null && String(value) === String(priceFilter);
       }
     }
 
-    return matchesLocation && matchesAttribute;
+    let matchesRating = true;
+    if (typeof ratingFilter === "number" && filterConfig.ratingField) {
+      const value = getValueAtPath(item, filterConfig.ratingField) ?? (item as Record<string, unknown>)[filterConfig.ratingField];
+      const numericValue =
+        typeof value === "number"
+          ? value
+          : typeof value === "string"
+            ? Number.parseFloat(value)
+            : null;
+      matchesRating = numericValue != null && Number.isFinite(numericValue) && numericValue >= ratingFilter;
+    }
+
+    return matchesLocation && matchesPrice && matchesRating;
   });
 }
 
@@ -440,16 +468,16 @@ const widgetDefinitions: WidgetDefinition[] = [
 const toolInputSchema = {
   type: "object",
   properties: {
-    headline: {
+    resultsTitle: {
       type: "string",
-      description: "Short headline to include with the rendered widget."
+      description: "Optional title to display above the directory results."
     },
     location: {
       type: "string",
-      description: "Optional location or city filter."
+      description: "Optional location, city, or neighborhood filter."
     },
-    attribute: {
-      description: "Optional attribute filter such as price tier.",
+    price: {
+      description: "Optional price tier filter such as $, $$.",
       oneOf: [
         { type: "string" },
         {
@@ -457,16 +485,21 @@ const toolInputSchema = {
           items: { type: "string" }
         }
       ]
+    },
+    minRating: {
+      type: "number",
+      description: "Optional minimum rating (0-5)."
     }
   },
-  required: ["headline"],
+  required: [],
   additionalProperties: false
 } as const;
 
 const toolInputParser = z.object({
-  headline: z.string(),
+  resultsTitle: z.string().optional(),
   location: z.string().optional(),
-  attribute: z.union([z.string(), z.array(z.string())]).optional()
+  price: z.union([z.string(), z.array(z.string())]).optional(),
+  minRating: z.coerce.number().min(0).max(5).optional()
 });
 
 type WidgetState = {
@@ -593,7 +626,8 @@ function createDirectoryServer(): Server {
     const args = toolInputParser.parse(request.params.arguments ?? {});
     const items = await fetchDirectoryItems({
       location: args.location,
-      attribute: args.attribute
+      price: args.price,
+      minRating: args.minRating ?? null
     });
 
     return {
@@ -604,7 +638,7 @@ function createDirectoryServer(): Server {
         }
       ],
       structuredContent: {
-        headline: args.headline,
+        resultsTitle: args.resultsTitle ?? null,
         items,
         ui: directoryUi,
         directory: {
@@ -613,7 +647,8 @@ function createDirectoryServer(): Server {
         },
         appliedFilters: {
           location: args.location ?? null,
-          attribute: args.attribute ?? null
+          price: args.price ?? null,
+          minRating: args.minRating ?? null
         }
       },
       _meta: widgetMeta(widget)

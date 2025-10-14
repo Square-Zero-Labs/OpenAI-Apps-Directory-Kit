@@ -31,7 +31,8 @@
   },
   "filters": {
     "locationFields": ["city", "neighborhood"],
-    "attributeField": "price"
+    "priceField": "price",
+    "ratingField": "rating"
   },
   "map": {
     "latitudeField": "coords.1",
@@ -41,7 +42,6 @@
   "dataSource": {
     "type": "supabase",
     "url": "https://your-project.supabase.co",
-    "serviceKeyEnv": "SUPABASE_SERVICE_ROLE_KEY",
     "table": "directory_places",
     "select": "id,name,description,address,city,region,neighborhood,rating,price,coords,thumbnail",
     "orderBy": {

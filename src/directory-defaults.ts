@@ -37,7 +37,7 @@ export const defaultDirectoryUi = {
 };
 
 export const defaultStructuredContent = {
-  headline: "City highlights",
+  resultsTitle: "City highlights",
   items: markers.places ?? [],
   ui: defaultDirectoryUi
 };

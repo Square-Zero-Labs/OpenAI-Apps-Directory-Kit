@@ -53,11 +53,18 @@ pnpm start
 
 The server listens on `PORT` (default `8000`) and exposes four tools: `directory-map`, `directory-list`, `directory-carousel`, and `directory-albums`. Each tool response includes plain text, structured JSON data, and `_meta.openai/outputTemplate` metadata that binds the response to the inlined widget markup.
 
+Supported tool arguments:
+
+- `resultsTitle` *(optional)* – heading to display above the returned directory results.
+- `location` *(optional)* – matches city or neighborhood fields.
+- `price` *(optional)* – string or array of strings (for example `$` or `[$$, $$$]`).
+- `minRating` *(optional)* – minimum rating (0–5) for returned items.
+
 ### Configuration
 
 - `directory_server_node/config/directory.json` – UI copy, theme colors, field mapping, and optional Supabase configuration.
 - `directory_server_node/data/directory-places.json` – Fallback data when remote sources are unavailable.
-- Set `SUPABASE_SERVICE_ROLE_KEY` (and update the config) to pull real records from Supabase; otherwise the bundled JSON is served.
+- To use Supabase, set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in your environment before starting the server. If either value is missing, the server automatically falls back to the bundled JSON data.
 
 Restart the server after changing the config or data files.
 
