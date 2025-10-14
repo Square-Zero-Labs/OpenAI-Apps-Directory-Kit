@@ -56,6 +56,10 @@ The server listens on `PORT` (default `8000`) and exposes four tools: `directory
 Supported tool arguments:
 
 - `resultsTitle` *(optional)* – heading to display above the returned directory results.
+- `location` *(optional)* – string matched against city and neighborhood fields.
+- `price` *(optional)* – single price tier (e.g., `$`) or list of tiers.
+- `minRating` *(optional)* – filter out places below this rating (0–5).
+- `limit` *(optional)* – maximum number of items to return (1–100).
 - `location` *(optional)* – matches city or neighborhood fields.
 - `price` *(optional)* – string or array of strings (for example `$` or `[$$, $$$]`).
 - `minRating` *(optional)* – minimum rating (0–5) for returned items.

@@ -171,7 +171,8 @@ export default function App() {
   useEffect(() => {
     if (!mapObj.current) return;
     addAllMarkers(normalizedPlaces);
-  }, [normalizedPlaces]);
+    fitMapToMarkers(mapObj.current, markerCoords);
+  }, [normalizedPlaces, markerCoords]);
 
   // Pan the map when the selected place changes via routing
   useEffect(() => {

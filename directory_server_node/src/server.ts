@@ -68,6 +68,7 @@ type DirectoryFilterInput = {
   location?: string | null;
   price?: string | string[] | null;
   minRating?: number | null;
+  limit?: number | null;
 };
 
 type WidgetDefinition = {
@@ -267,6 +268,10 @@ async function fetchDirectoryItems(
           query.gte(filterConfig.ratingField, ratingFilter);
         }
 
+        if (filters?.limit && Number.isFinite(filters.limit)) {
+          query.limit(Math.max(1, Math.min(100, filters.limit)));
+        }
+
         if (dataSource.orderBy?.column) {
           query.order(dataSource.orderBy.column, {
             ascending: dataSource.orderBy.ascending ?? true
@@ -298,8 +303,9 @@ async function fetchDirectoryItems(
   const priceField = filterConfig.priceField ?? filterConfig.attributeField;
   const priceFilter = filters?.price;
   const ratingFilter = filters?.minRating;
+  const limit = filters?.limit;
 
-  return fallbackData.items.filter((item) => {
+  const filtered = fallbackData.items.filter((item) => {
     let matchesLocation = true;
     if (locationFilter && locationFields.length > 0) {
       matchesLocation = locationFields.some((field) => {
@@ -333,6 +339,12 @@ async function fetchDirectoryItems(
 
     return matchesLocation && matchesPrice && matchesRating;
   });
+
+  if (limit && Number.isFinite(limit)) {
+    return filtered.slice(0, Math.max(0, Math.min(100, limit)));
+  }
+
+  return filtered;
 }
 
 function widgetMeta(widget: DirectoryWidget) {
@@ -489,6 +501,12 @@ const toolInputSchema = {
     minRating: {
       type: "number",
       description: "Optional minimum rating (0-5)."
+    },
+    limit: {
+      type: "number",
+      minimum: 1,
+      maximum: 100,
+      description: "Optional maximum number of items to return (defaults to all)."
     }
   },
   required: [],
@@ -499,7 +517,8 @@ const toolInputParser = z.object({
   resultsTitle: z.string().optional(),
   location: z.string().optional(),
   price: z.union([z.string(), z.array(z.string())]).optional(),
-  minRating: z.coerce.number().min(0).max(5).optional()
+  minRating: z.coerce.number().min(0).max(5).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional()
 });
 
 type WidgetState = {
@@ -627,7 +646,8 @@ function createDirectoryServer(): Server {
     const items = await fetchDirectoryItems({
       location: args.location,
       price: args.price,
-      minRating: args.minRating ?? null
+      minRating: args.minRating ?? null,
+      limit: args.limit ?? null
     });
 
     return {
@@ -648,7 +668,8 @@ function createDirectoryServer(): Server {
         appliedFilters: {
           location: args.location ?? null,
           price: args.price ?? null,
-          minRating: args.minRating ?? null
+          minRating: args.minRating ?? null,
+          limit: args.limit ?? null
         }
       },
       _meta: widgetMeta(widget)
