@@ -6,6 +6,12 @@ import fs from "fs";
 import crypto from "crypto";
 import tailwindcss from "@tailwindcss/vite";
 
+// @ts-ignore Runtime helper implemented in JavaScript only
+const directoryConfigModule = await import("./scripts/directory-config.mjs");
+const { syncDirectoryConfig } = directoryConfigModule as typeof import("./scripts/directory-config-types");
+
+await syncDirectoryConfig({ log: true });
+
 const entries = fg.sync("src/**/index.{tsx,jsx}");
 const outDir = "assets";
 

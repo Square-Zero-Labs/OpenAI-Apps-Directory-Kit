@@ -5,11 +5,16 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import albumsData from "./albums.json";
 import { useMaxHeight } from "../use-max-height";
 import { useOpenAiGlobal } from "../use-openai-global";
+import { useWidgetProps } from "../use-widget-props";
+import {
+  defaultStructuredContent,
+  defaultDirectoryUi,
+} from "../directory-defaults";
+import { themeStyleVars } from "../directory-utils";
 import FullscreenViewer from "./FullscreenViewer";
 import AlbumCard from "./AlbumCard";
 
-function AlbumsCarousel({ onSelect }) {
-  const albums = albumsData?.albums || [];
+function AlbumsCarousel({ albums, onSelect, logoUrl, title, subtitle }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
     loop: false,
@@ -37,6 +42,26 @@ function AlbumsCarousel({ onSelect }) {
 
   return (
     <div className="antialiased relative w-full text-black py-5 select-none">
+      <div className="flex items-center justify-between px-5 pb-3">
+        <div>
+          <div className="text-lg font-semibold">
+            {title ?? "Featured albums"}
+          </div>
+          {subtitle ? (
+            <div className="text-sm text-black/60">{subtitle}</div>
+          ) : null}
+        </div>
+        {logoUrl ? (
+          <div className="h-10 w-10 rounded-lg overflow-hidden border border-black/10 flex-shrink-0">
+            <img
+              src={logoUrl}
+              alt={title ?? "Directory logo"}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        ) : null}
+      </div>
       <div className="overflow-hidden max-sm:mx-5" ref={emblaRef}>
         <div className="flex gap-5 items-stretch">
           {albums.map((album) => (
@@ -111,10 +136,17 @@ function AlbumsCarousel({ onSelect }) {
 }
 
 function App() {
+  const widgetProps = useWidgetProps(() => defaultStructuredContent);
+  const ui = widgetProps?.ui ?? defaultDirectoryUi;
+  const themeVars = themeStyleVars(ui.theme);
+  const logoUrl = ui.branding?.logoUrl ?? null;
+
   const displayMode = useOpenAiGlobal("displayMode");
   const [selectedAlbum, setSelectedAlbum] = React.useState(null);
   const maxHeight = useMaxHeight() ?? undefined;
   const isFullscreen = displayMode === "fullscreen";
+
+  const albums = albumsData?.albums ?? [];
 
   const handleSelectAlbum = React.useCallback(
     (album) => {
@@ -141,17 +173,25 @@ function App() {
     <div
       className="relative antialiased w-full"
       style={{
+        ...themeVars,
         maxHeight,
         height: isFullscreen ? maxHeight : undefined,
       }}
     >
-      <AlbumsCarousel onSelect={handleSelectAlbum} />
+      <AlbumsCarousel
+        albums={albums}
+        onSelect={handleSelectAlbum}
+        logoUrl={logoUrl}
+        title={ui.copy?.listTitle ?? ui.copy?.appTitle}
+        subtitle={ui.copy?.listSubtitle}
+      />
 
       {overlayActive && (
         <FullscreenViewer
           album={selectedAlbum}
           onClose={handleCloseAlbum}
           fullscreen={isFullscreen}
+          logoUrl={logoUrl}
         />
       )}
 

@@ -4,6 +4,9 @@
   "description": "React widgets and an MCP server for building directory-style ChatGPT apps.",
   "main": "host/main.ts",
   "scripts": {
+    "sync:directory": "node ./scripts/directory-config.mjs",
+    "predev": "pnpm run sync:directory",
+    "prebuild": "pnpm run sync:directory",
     "build": "tsx ./build-all.mts",
     "serve": "serve -s ./assets -p 4044 --cors",
     "dev": "vite --config vite.config.mts",

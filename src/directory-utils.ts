@@ -157,17 +157,30 @@ export function normalizeDirectoryItems(
       const price = getFieldValue<string>(item, fields, "price");
       const thumbnail = getFieldValue<string>(item, fields, "thumbnail");
 
-      return {
+      const normalized: NormalizedDirectoryItem = {
         id,
         coords,
         title,
-        subtitle: subtitle ?? undefined,
-        description: description ?? undefined,
-        rating: rating ?? undefined,
-        price: price ?? undefined,
-        thumbnail: thumbnail ?? undefined,
         raw: item
       };
+
+      if (subtitle != null && subtitle !== "") {
+        normalized.subtitle = subtitle;
+      }
+      if (description != null && description !== "") {
+        normalized.description = description;
+      }
+      if (rating != null) {
+        normalized.rating = rating;
+      }
+      if (price != null && price !== "") {
+        normalized.price = price;
+      }
+      if (thumbnail != null && thumbnail !== "") {
+        normalized.thumbnail = thumbnail;
+      }
+
+      return normalized;
     })
     .filter((item): item is NormalizedDirectoryItem => item !== null);
 }

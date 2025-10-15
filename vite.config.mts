@@ -5,6 +5,11 @@ import path from "node:path";
 import fs from "node:fs";
 import tailwindcss from "@tailwindcss/vite";
 
+// @ts-ignore Runtime helper implemented in JavaScript only
+const directoryConfigModule = await import("./scripts/directory-config.mjs");
+const { syncDirectoryConfig, directoryConfigPaths } =
+  directoryConfigModule as typeof import("./scripts/directory-config-types");
+
 function buildInputs() {
   const files = fg.sync("src/**/index.{tsx,jsx}", { dot: false });
   return Object.fromEntries(
@@ -201,8 +206,39 @@ if (!window.__vite_plugin_react_preamble_installed__) {
 
 const inputs = buildInputs();
 
+function directoryConfigPlugin(): Plugin {
+  const watched = new Set(
+    [directoryConfigPaths.config, directoryConfigPaths.data].map((p) =>
+      path.resolve(p)
+    )
+  );
+
+  const maybeSync = async () => {
+    await syncDirectoryConfig({ log: true });
+  };
+
+  return {
+    name: "directory-config-sync",
+    async buildStart() {
+      await maybeSync();
+    },
+    configureServer(server) {
+      for (const file of watched) {
+        server.watcher.add(file);
+      }
+      const handler = async (file: string) => {
+        if (!watched.has(path.resolve(file))) return;
+        await maybeSync();
+      };
+      server.watcher.on("change", handler);
+      server.watcher.on("add", handler);
+    }
+  };
+}
+
 export default defineConfig(({}) => ({
   plugins: [
+    directoryConfigPlugin(),
     tailwindcss(),
     react(),
     multiEntryDevEndpoints({ entries: inputs }),

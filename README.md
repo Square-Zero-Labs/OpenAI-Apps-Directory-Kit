@@ -1,6 +1,6 @@
 # OpenAI Apps Directory Kit
 
-The OpenAI Apps Directory Kit makes it easy to build an OpenAI App that serves as a specialized directory (for specialty grocery stores, or sauna locations or anything). It bundles React widgets (map, list, carousel, albums) and an MCP server that embeds those widgets directly in tool responses—no separate asset hosting required.
+The OpenAI Apps Directory Kit makes it easy to build an OpenAI App that serves as a specialized directory (for pizza places or dog parks or anything). It bundles React widgets (map, list, carousel, albums) and an MCP server that embeds those widgets directly in tool responses—no separate asset hosting required.
 
 ## What’s inside
 
@@ -55,22 +55,21 @@ The server listens on `PORT` (default `8000`) and exposes four tools: `directory
 
 Supported tool arguments:
 
-- `resultsTitle` *(optional)* – heading to display above the returned directory results.
-- `location` *(optional)* – string matched against city and neighborhood fields.
-- `price` *(optional)* – single price tier (e.g., `$`) or list of tiers.
-- `minRating` *(optional)* – filter out places below this rating (0–5).
-- `limit` *(optional)* – maximum number of items to return (1–100).
-- `location` *(optional)* – matches city or neighborhood fields.
-- `price` *(optional)* – string or array of strings (for example `$` or `[$$, $$$]`).
-- `minRating` *(optional)* – minimum rating (0–5) for returned items.
+- `resultsTitle` _(optional)_ – heading to display above the returned directory results.
+- `location` _(optional)_ – string matched against city and neighborhood fields.
+- `price` _(optional)_ – single price tier (e.g., `$`) or list of tiers.
+- `minRating` _(optional)_ – filter out places below this rating (0–5).
+- `limit` _(optional)_ – maximum number of items to return (1–100).
+- `location` _(optional)_ – matches city or neighborhood fields.
 
 ### Configuration
 
-- `directory_server_node/config/directory.json` – UI copy, theme colors, field mapping, and optional Supabase configuration.
-- `directory_server_node/data/directory-places.json` – Fallback data when remote sources are unavailable.
+- Edit `directory_server_node/config/directory.json` to change copy, theming, field mappings, and optional Supabase settings. The dev and build scripts run `pnpm run sync:directory` automatically, and Vite watches the file, so the frontend widgets pick up your changes without touching multiple files.
+- `branding.logoUrl` lets you add your own logo; the widgets automatically display it in their headers.
+- `directory_server_node/data/directory-places.json` remains the bundled fallback dataset that seeds both the MCP server and the frontend preview defaults.
 - To use Supabase, set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in your environment before starting the server. If either value is missing, the server automatically falls back to the bundled JSON data.
 
-Restart the server after changing the config or data files.
+The MCP server now watches both JSON files and reloads them on the fly, so you can tweak copy or data without restarting the process. If you update the files while `pnpm dev` is running, the generated `src/directory-defaults.ts` refreshes automatically; otherwise run `pnpm run sync:directory` to regenerate the frontend defaults.
 
 ## Testing in ChatGPT developer mode
 

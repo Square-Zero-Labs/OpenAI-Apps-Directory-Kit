@@ -1,6 +1,6 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { URL } from "node:url";
+import { existsSync, readFileSync, readdirSync, watch } from "node:fs";
+import { URL, fileURLToPath } from "node:url";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -97,7 +97,107 @@ type DirectoryWidget = WidgetDefinition & {
 const serverRoot = new URL("../", import.meta.url);
 const repoRoot = new URL("../", serverRoot);
 const assetsRootUrl = new URL("./assets/", repoRoot);
+const directoryConfigUrl = new URL("./config/directory.json", serverRoot);
+const directoryDataUrl = new URL("./data/directory-places.json", serverRoot);
+const directoryConfigPath = fileURLToPath(directoryConfigUrl);
+const directoryDataPath = fileURLToPath(directoryDataUrl);
 const assetVariantCache = new Map<string, string>();
+
+function loadDirectoryConfigFromDisk(): DirectoryConfig {
+  const raw = readFileSync(directoryConfigUrl, "utf8");
+  return JSON.parse(raw) as DirectoryConfig;
+}
+
+function loadFallbackItemsFromDisk(): DirectoryItem[] {
+  const raw = readFileSync(directoryDataUrl, "utf8");
+  const parsed = JSON.parse(raw) as { items?: unknown };
+  if (!parsed || !Array.isArray(parsed.items)) {
+    return [];
+  }
+  return parsed.items.filter(hasStringId) as DirectoryItem[];
+}
+
+function buildDirectoryUi(config: DirectoryConfig) {
+  return {
+    theme: config.theme ?? {},
+    copy: config.copy ?? {},
+    fields: config.fields ?? {},
+    map: config.map ?? {},
+    branding: config.branding ?? {}
+  };
+}
+
+let directoryConfig = loadDirectoryConfigFromDisk();
+let fallbackItems = loadFallbackItemsFromDisk();
+let directoryUi = buildDirectoryUi(directoryConfig);
+
+function refreshDirectoryConfig(options: { source?: string; log?: boolean } = {}) {
+  try {
+    const nextConfig = loadDirectoryConfigFromDisk();
+    directoryConfig = nextConfig;
+    directoryUi = buildDirectoryUi(nextConfig);
+    if (options.log !== false) {
+      console.log(
+        `[directory] Reloaded directory config${options.source ? ` (${options.source})` : ""}`
+      );
+    }
+  } catch (error) {
+    console.error("[directory] Failed to reload directory config", error);
+  }
+}
+
+function refreshFallbackItems(options: { source?: string; log?: boolean } = {}) {
+  try {
+    fallbackItems = loadFallbackItemsFromDisk();
+    if (options.log !== false) {
+      console.log(
+        `[directory] Reloaded fallback places ${options.source ? `(${options.source})` : ""}`
+      );
+    }
+  } catch (error) {
+    console.error("[directory] Failed to reload fallback directory data", error);
+  }
+}
+
+let configReloadTimer: NodeJS.Timeout | null = null;
+let dataReloadTimer: NodeJS.Timeout | null = null;
+
+function scheduleDirectoryReload(kind: "config" | "data") {
+  if (kind === "config") {
+    if (configReloadTimer) return;
+    configReloadTimer = setTimeout(() => {
+      configReloadTimer = null;
+      refreshDirectoryConfig({ source: "watch" });
+    }, 150);
+    return;
+  }
+
+  if (dataReloadTimer) return;
+  dataReloadTimer = setTimeout(() => {
+    dataReloadTimer = null;
+    refreshFallbackItems({ source: "watch" });
+  }, 150);
+}
+
+try {
+  watch(directoryConfigPath, { persistent: true }, (eventType) => {
+    if (eventType === "change" || eventType === "rename") {
+      scheduleDirectoryReload("config");
+    }
+  });
+} catch (error) {
+  console.warn("[directory] Unable to watch directory config for changes", error);
+}
+
+try {
+  watch(directoryDataPath, { persistent: true }, (eventType) => {
+    if (eventType === "change" || eventType === "rename") {
+      scheduleDirectoryReload("data");
+    }
+  });
+} catch (error) {
+  console.warn("[directory] Unable to watch fallback data for changes", error);
+}
 
 function normalizeAssetPath(assetPath: string): string {
   return assetPath.replace(/\\/g, "/").replace(/^\//, "");
@@ -166,22 +266,6 @@ function resolveAssetVariant(assetPath: string): string {
   );
   return resolved;
 }
-
-const directoryConfig: DirectoryConfig = JSON.parse(
-  readFileSync(new URL("./config/directory.json", serverRoot), "utf8")
-);
-
-const fallbackData: { items: DirectoryItem[] } = JSON.parse(
-  readFileSync(new URL("./data/directory-places.json", serverRoot), "utf8")
-);
-
-const directoryUi = {
-  theme: directoryConfig.theme ?? {},
-  copy: directoryConfig.copy ?? {},
-  fields: directoryConfig.fields ?? {},
-  map: directoryConfig.map ?? {},
-  branding: directoryConfig.branding ?? {}
-};
 
 let supabaseClient: SupabaseClient | null = null;
 
@@ -309,7 +393,7 @@ async function fetchDirectoryItems(
   const ratingFilter = filters?.minRating;
   const limit = filters?.limit;
 
-  const filtered = fallbackData.items.filter((item) => {
+  const filtered = fallbackItems.filter((item) => {
     let matchesLocation = true;
     if (locationFilter && locationFields.length > 0) {
       matchesLocation = locationFields.some((field) => {

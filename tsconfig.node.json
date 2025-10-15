@@ -11,6 +11,9 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
+    "paths": {
+      "./scripts/directory-config.mjs": ["./scripts/directory-config-types"]
+    },
     "noEmit": true,
 
     /* Linting */
@@ -25,6 +28,8 @@
     "vite.host.config.mts",
     "vite.config.mts",
     "build-all.mts",
-    "dev-all.mts"
+    "dev-all.mts",
+    "scripts/**/*.d.ts",
+    "directory-config-ambient.d.ts"
   ]
 }
