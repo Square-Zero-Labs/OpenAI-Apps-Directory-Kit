@@ -4,23 +4,23 @@
  */
 export const defaultDirectoryUi = {
   "theme": {
-    "primary": "#2563EB",
-    "accent": "#10B981",
-    "background": "#F8FAFC"
+    "primary": "#F97316",
+    "accent": "#FBBF24",
+    "background": "#FFF8E7"
   },
   "copy": {
-    "appTitle": "Directory Demo",
-    "listTitle": "City Highlights",
-    "listSubtitle": "A shortlist of places locals ❤️",
-    "emptyState": "No places match yet.",
-    "inspectorLocationLabel": "San Francisco Bay Area",
-    "filterLabel": "Filter",
-    "detailFallback": "Explore the neighborhood highlights curated for your day.",
-    "reviewsTitle": "Visitor notes",
-    "learnMoreLabel": "Learn more"
+    "appTitle": "FuzzPuppy Pack Finder",
+    "listTitle": "Dog-Friendly Highlights",
+    "listSubtitle": "Sniff out the best spots for pups and their humans.",
+    "emptyState": "No dog-friendly spots yet—keep those tails wagging and try again soon.",
+    "inspectorLocationLabel": "Pup Patrol HQ",
+    "filterLabel": "Filter by Fetch",
+    "detailFallback": "Discover tail-wagging adventures curated for your pack.",
+    "reviewsTitle": "Pack Notes",
+    "learnMoreLabel": "Fetch details"
   },
   "branding": {
-    "logoUrl": "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=180&q=80"
+    "logoUrl": "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&w=240&q=80"
   },
   "fields": {
     "title": "name",
@@ -50,77 +50,93 @@ export const defaultDirectoryUi = {
 };
 
 export const defaultStructuredContent = {
-  "resultsTitle": "City Highlights",
+  "resultsTitle": "Dog-Friendly Highlights",
   "items": [
     {
-      "id": "harbor-and-pine",
-      "name": "Seaport & Clouds Coffeehouse",
-      "description": "Sunlit cafe with rotating micro-roasters and roomy communal tables.",
-      "address": "415 Harbor Ave",
+      "id": "golden-gate-bark",
+      "name": "Golden Gate Barklands",
+      "description": "Off-leash meadows tucked beneath the cypress trees with dog fountains and agility logs.",
+      "address": "Transverse Dr & Middle Dr W",
       "city": "San Francisco",
       "region": "CA",
-      "neighborhood": "North Beach",
+      "neighborhood": "Golden Gate Park",
+      "rating": 4.9,
+      "price": "$",
+      "coords": [
+        -122.4862,
+        37.7694
+      ],
+      "thumbnail": "https://images.unsplash.com/photo-1525253086316-d0c936c814f8?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "id": "mission-mutt-market",
+      "name": "Mission Mutt Market",
+      "description": "Dog-forward cafe pairing single-origin espresso with pup cups, bully stick flights, and toy swaps.",
+      "address": "700 Valencia St",
+      "city": "San Francisco",
+      "region": "CA",
+      "neighborhood": "Mission District",
       "rating": 4.8,
       "price": "$$",
       "coords": [
-        -122.4105,
-        37.8008
+        -122.4195,
+        37.761
       ],
-      "thumbnail": "https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?auto=format&fit=crop&w=400&q=80"
+      "thumbnail": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=400&q=80"
     },
     {
-      "id": "gallery-mercantile",
-      "name": "Gallery Mercantile",
-      "description": "Indie art gallery with local makers and Friday salon nights.",
-      "address": "90 Montgomery St",
+      "id": "bay-fetch-beach",
+      "name": "Bay Fetch Beach",
+      "description": "Wind-sheltered stretch of Crissy Field where pups chase tennis balls into the bay at golden hour.",
+      "address": "Crissy Field East Beach",
       "city": "San Francisco",
       "region": "CA",
-      "neighborhood": "Jackson Square",
+      "neighborhood": "Presidio",
       "rating": 4.7,
-      "price": "$$",
+      "price": "$",
       "coords": [
-        -122.4028,
-        37.7973
+        -122.4642,
+        37.8043
       ],
-      "thumbnail": "https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=400&q=80"
+      "thumbnail": "https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?auto=format&fit=crop&w=400&q=80"
     },
     {
-      "id": "skyline-lookout",
-      "name": "Skyline Lookout Terrace",
-      "description": "Glass rooftop lounge with 360° views and seasonal mocktails.",
-      "address": "1 Market St",
-      "city": "San Francisco",
-      "region": "CA",
-      "neighborhood": "Downtown",
-      "rating": 4.6,
-      "price": "$$$",
-      "coords": [
-        -122.4012,
-        37.7915
-      ],
-      "thumbnail": "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=400&q=80"
-    },
-    {
-      "id": "maker-lane-studio",
-      "name": "Maker Lane Studio",
-      "description": "Hands-on workshop for ceramics, textiles, and screen printing.",
-      "address": "245 Maker Ln",
+      "id": "paws-and-pours",
+      "name": "Paws & Pours Taproom",
+      "description": "Small-batch brewery with a fenced sniff patio, dog beer flights, and weekend adoption pop-ups.",
+      "address": "250 Townsend St",
       "city": "San Francisco",
       "region": "CA",
       "neighborhood": "SoMa",
+      "rating": 4.6,
+      "price": "$$",
+      "coords": [
+        -122.398,
+        37.7765
+      ],
+      "thumbnail": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "id": "whisker-wash-spa",
+      "name": "Whisker Wash Spa",
+      "description": "Spa-style grooming studio featuring hypoallergenic soaks, blueberry facials, and paw balm bar.",
+      "address": "3200 Polk St",
+      "city": "San Francisco",
+      "region": "CA",
+      "neighborhood": "Marina District",
       "rating": 4.5,
       "price": "$$",
       "coords": [
-        -122.4065,
-        37.7802
+        -122.422,
+        37.8007
       ],
-      "thumbnail": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80"
+      "thumbnail": "https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=400&q=80"
     },
     {
-      "id": "bay-trail-commons",
-      "name": "Bay Trail Commons",
-      "description": "Waterfront park with pop-up markets and weekend yoga.",
-      "address": "100 Pier 7",
+      "id": "treat-truck-stop",
+      "name": "Treat Truck Stop",
+      "description": "Rotating lineup of gourmet pup treat trucks with chews, frozen paw-sicles, and training demos.",
+      "address": "Pier 7",
       "city": "San Francisco",
       "region": "CA",
       "neighborhood": "Embarcadero",
@@ -130,76 +146,60 @@ export const defaultStructuredContent = {
         -122.3919,
         37.7989
       ],
-      "thumbnail": "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=400&q=80"
+      "thumbnail": "https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=400&q=80"
     },
     {
-      "id": "lumen-reading-room",
-      "name": "Lumen Reading Room",
-      "description": "Quiet library lounge with floor-to-ceiling stacks and tea service.",
-      "address": "1919 Pacific Ave",
+      "id": "sniffari-trails",
+      "name": "Sniffari Trails",
+      "description": "Shaded canyon paths with scent stations, paw-friendly creek crossings, and weekend pack hikes.",
+      "address": "200 Elk St",
       "city": "San Francisco",
       "region": "CA",
-      "neighborhood": "Pacific Heights",
+      "neighborhood": "Glen Canyon",
       "rating": 4.7,
-      "price": "$$",
+      "price": "$",
       "coords": [
-        -122.4362,
-        37.7924
+        -122.4464,
+        37.7385
       ],
-      "thumbnail": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=400&q=80"
+      "thumbnail": "https://images.unsplash.com/photo-1433162653888-a571db5ccccf?auto=format&fit=crop&w=400&q=80"
     },
     {
-      "id": "evening-market-arcade",
-      "name": "Evening Market Arcade",
-      "description": "Late-night food hall featuring small batch vendors and live sets.",
-      "address": "700 Valencia St",
+      "id": "barketplace-collective",
+      "name": "Barketplace Collective",
+      "description": "Hayes Valley concept shop with artisan leashes, local kibble makers, and on-call pup stylists.",
+      "address": "432 Octavia St",
       "city": "San Francisco",
       "region": "CA",
-      "neighborhood": "Mission District",
-      "rating": 4.5,
+      "neighborhood": "Hayes Valley",
+      "rating": 4.6,
       "price": "$$",
       "coords": [
-        -122.4192,
-        37.7603
+        -122.425,
+        37.776
       ],
-      "thumbnail": "https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=400&q=80"
-    },
-    {
-      "id": "sunset-conservatory",
-      "name": "Sunset Conservatory",
-      "description": "Greenhouse-inspired workspace filled with greenery and natural light.",
-      "address": "1234 Judah St",
-      "city": "San Francisco",
-      "region": "CA",
-      "neighborhood": "Sunset",
-      "rating": 4.4,
-      "price": "$$",
-      "coords": [
-        -122.4855,
-        37.7593
-      ],
-      "thumbnail": "https://images.unsplash.com/photo-1526401485004-2cc5c0d3ac93?auto=format&fit=crop&w=400&q=80"
+      "thumbnail": "https://images.unsplash.com/photo-1494256997604-768d1f608cac?auto=format&fit=crop&w=400&q=80"
     }
   ],
   "ui": {
     "theme": {
-      "primary": "#2563EB",
-      "accent": "#10B981",
-      "background": "#F8FAFC"
+      "primary": "#F97316",
+      "accent": "#FBBF24",
+      "background": "#FFF8E7"
     },
     "copy": {
-      "appTitle": "Directory Demo",
-      "listTitle": "City Highlights",
-      "listSubtitle": "A shortlist of places locals ❤️",
-      "emptyState": "No places match yet.",
-      "inspectorLocationLabel": "San Francisco Bay Area",
-      "filterLabel": "Filter",
-      "detailFallback": "Explore the neighborhood highlights curated for your day.",
-      "reviewsTitle": "Visitor notes",
-      "learnMoreLabel": "Learn more"
+      "appTitle": "FuzzPuppy Pack Finder",
+      "listTitle": "Dog-Friendly Highlights",
+      "listSubtitle": "Sniff out the best spots for pups and their humans.",
+      "emptyState": "No dog-friendly spots yet—keep those tails wagging and try again soon.",
+      "inspectorLocationLabel": "Pup Patrol HQ",
+      "filterLabel": "Filter by Fetch",
+      "detailFallback": "Discover tail-wagging adventures curated for your pack.",
+      "reviewsTitle": "Pack Notes",
+      "learnMoreLabel": "Fetch details"
     },
     "branding": {
-      "logoUrl": "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=180&q=80"
+      "logoUrl": "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&w=240&q=80"
     },
     "fields": {
       "title": "name",
@@ -228,7 +228,7 @@ export const defaultStructuredContent = {
     }
   },
   "directory": {
-    "label": "OpenAI Apps Directory",
-    "slug": "open-directory"
+    "label": "FuzzPuppy Dog Directory",
+    "slug": "fuzzpuppy-directory"
   }
 };

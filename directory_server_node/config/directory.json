@@ -1,24 +1,24 @@
 {
-  "label": "OpenAI Apps Directory",
-  "slug": "open-directory",
+  "label": "FuzzPuppy Dog Directory",
+  "slug": "fuzzpuppy-directory",
   "theme": {
-    "primary": "#2563EB",
-    "accent": "#10B981",
-    "background": "#F8FAFC"
+    "primary": "#F97316",
+    "accent": "#FBBF24",
+    "background": "#FFF8E7"
   },
   "copy": {
-    "appTitle": "Directory Demo",
-    "listTitle": "City Highlights",
-    "listSubtitle": "A shortlist of places locals ❤️",
-    "emptyState": "No places match yet.",
-    "inspectorLocationLabel": "San Francisco Bay Area",
-    "filterLabel": "Filter",
-    "detailFallback": "Explore the neighborhood highlights curated for your day.",
-    "reviewsTitle": "Visitor notes",
-    "learnMoreLabel": "Learn more"
+    "appTitle": "FuzzPuppy Pack Finder",
+    "listTitle": "Dog-Friendly Highlights",
+    "listSubtitle": "Sniff out the best spots for pups and their humans.",
+    "emptyState": "No dog-friendly spots yet—keep those tails wagging and try again soon.",
+    "inspectorLocationLabel": "Pup Patrol HQ",
+    "filterLabel": "Filter by Fetch",
+    "detailFallback": "Discover tail-wagging adventures curated for your pack.",
+    "reviewsTitle": "Pack Notes",
+    "learnMoreLabel": "Fetch details"
   },
   "branding": {
-    "logoUrl": "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=180&q=80"
+    "logoUrl": "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&w=240&q=80"
   },
   "fields": {
     "title": "name",
@@ -44,7 +44,6 @@
   },
   "dataSource": {
     "type": "supabase",
-    "url": "https://your-project.supabase.co",
     "table": "directory_places",
     "select": "id,name,description,address,city,region,neighborhood,rating,price,coords,thumbnail",
     "orderBy": {
