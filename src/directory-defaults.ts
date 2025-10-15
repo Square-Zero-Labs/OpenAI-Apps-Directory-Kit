@@ -178,7 +178,7 @@ export const defaultStructuredContent = {
         -122.4855,
         37.7593
       ],
-      "thumbnail": "https://images.unsplash.com/photo-1523419409543-0c1df022bdd5?auto=format&fit=crop&w=400&q=80"
+      "thumbnail": "https://images.unsplash.com/photo-1526401485004-2cc5c0d3ac93?auto=format&fit=crop&w=400&q=80"
     }
   ],
   "ui": {

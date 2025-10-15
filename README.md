@@ -20,61 +20,64 @@ The OpenAI Apps Directory Kit makes it easy to build an OpenAI App that serves a
 pnpm install
 ```
 
-## Build the widgets
-
-```bash
-pnpm run build
-```
-
-This runs `build-all.mts`, producing versioned bundles for each widget in `assets/`. The bundles are self-contained so the server can inline the CSS/JS into every response.
-
-For hot reload during widget development:
+## Develop the widgets
 
 ```bash
 pnpm run dev
 ```
 
-> Vite serves the widgets on `http://localhost:4044`. You can run it alongside the MCP server by starting each command in its own terminal.
+Vite serves each widget on `http://localhost:4044/<widget>.html` with hot reloading. The dev server also injects the current directory data as `window.openai.toolOutput`, so you see populated widgets while iterating.
 
-To serve the current production bundles without Vite:
+Run the MCP server in a separate terminal if you want to test ChatGPT integration while the widget dev server is running.
+
+## Build production bundles (as needed)
 
 ```bash
 pnpm run build
-pnpm run serve   # serves ./assets on http://localhost:4044
 ```
+
+The build step hashes and emits standalone JS/CSS/HTML bundles in `assets/`. Run it whenever the MCP server should inline updated widget code—for example, after tweaking components or before deploying to an environment that cannot rely on Vite.
+
+You can skip this step while experimenting solely with Vite previews.
 
 ## Run the MCP server
 
 ```bash
-pnpm run build        # ensure assets exist
+# from the repository root
+pnpm run sync:directory   # keep generated defaults in sync (dev/build run this automatically)
 cd directory_server_node
 pnpm start
 ```
+
+The server reads the generated assets from `assets/` and watches the config/data files for changes. Build whenever you need fresh assets; the server simply uses the latest files that exist in `assets/`. When switching from Vite previews back to MCP testing, run `pnpm run build` so the inlined assets reflect your most recent changes.
 
 The server listens on `PORT` (default `8000`) and exposes four tools: `directory-map`, `directory-list`, `directory-carousel`, and `directory-albums`. Each tool response includes plain text, structured JSON data, and `_meta.openai/outputTemplate` metadata that binds the response to the inlined widget markup.
 
 Supported tool arguments:
 
-- `resultsTitle` _(optional)_ – heading to display above the returned directory results.
-- `location` _(optional)_ – string matched against city and neighborhood fields.
+- `resultsTitle` _(optional)_ – overrides the default heading shown above the results so a tool call can tailor copy like “Coffee shops near Union Square.”
 - `price` _(optional)_ – single price tier (e.g., `$`) or list of tiers.
 - `minRating` _(optional)_ – filter out places below this rating (0–5).
 - `limit` _(optional)_ – maximum number of items to return (1–100).
-- `location` _(optional)_ – matches city or neighborhood fields.
+- `location` _(optional)_ – string matched against city and neighborhood fields.
 
 ### Configuration
 
 - Edit `directory_server_node/config/directory.json` to change copy, theming, field mappings, and optional Supabase settings. The dev and build scripts run `pnpm run sync:directory` automatically, and Vite watches the file, so the frontend widgets pick up your changes without touching multiple files.
 - `branding.logoUrl` lets you add your own logo; the widgets automatically display it in their headers.
 - `directory_server_node/data/directory-places.json` remains the bundled fallback dataset that seeds both the MCP server and the frontend preview defaults.
-- To use Supabase, set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in your environment before starting the server. If either value is missing, the server automatically falls back to the bundled JSON data.
+- To use Supabase, copy `directory_server_node/.env.example` to `directory_server_node/.env`, fill in `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`, or export those variables in your shell before starting the server. If either value is missing, the server automatically falls back to the bundled JSON data.
 
-The MCP server now watches both JSON files and reloads them on the fly, so you can tweak copy or data without restarting the process. If you update the files while `pnpm dev` is running, the generated `src/directory-defaults.ts` refreshes automatically; otherwise run `pnpm run sync:directory` to regenerate the frontend defaults. Inside ChatGPT the widgets first show a playful loading illustration and only render places once fresh data arrives, so users never see stale results.
-
-When you run `pnpm dev`, the local Vite server injects the latest structured content into `window.oai`, so the previews on `http://localhost:4044/<widget>.html` stay fully populated while you iterate; the hot-loading behavior remains unchanged when served through the MCP server.
+The MCP server watches both JSON files and reloads them on the fly, so you can tweak copy or data without restarting the process. If you update the files while `pnpm dev` is running, the generated `src/directory-defaults.ts` refreshes automatically; otherwise run `pnpm run sync:directory` to regenerate the frontend defaults. Inside ChatGPT the widgets first show a playful loading illustration and only render places once fresh data arrives, so users never see stale results. Locally, Vite keeps `window.openai.toolOutput` populated so the previews on `http://localhost:4044/<widget>.html` stay full while you iterate.
 
 ## Testing in ChatGPT developer mode
 
+If you need to expose your local server over the internet, start an ngrok tunnel alongside the MCP server and then use the forwarded URL in step 2:
+
+```bash
+ngrok http 8000
+```
+
 1. Enable developer mode and add a custom connector in ChatGPT.
-2. Point the connector at your MCP server (for example, `https://<your-ngrok-subdomain>.ngrok-free.app/mcp`).
+2. Point the connector at your MCP server (for example, `https://<random>.ngrok-free.app/mcp`).
 3. Invoke one of the directory tools; ChatGPT will render the widgets using the embedded assets and structured content.

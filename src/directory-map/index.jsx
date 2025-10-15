@@ -60,6 +60,13 @@ export default function App() {
     !widgetProps || (widgetProps && widgetProps._directoryFallback);
   const ui = widgetProps?.ui ?? defaultDirectoryUi;
   const themeVars = useMemo(() => themeStyleVars(ui.theme), [ui.theme]);
+  const containerStyle = useMemo(
+    () => ({
+      ...themeVars,
+      backgroundColor: ui.theme?.background ?? "#F8FAFC"
+    }),
+    [themeVars, ui.theme]
+  );
   const items = useMemo(
     () => (isLoading ? [] : widgetProps?.items ?? []),
     [isLoading, widgetProps]
@@ -227,12 +234,10 @@ export default function App() {
   }, [maxHeight, displayMode, isLoading]);
 
   useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      window.oai &&
-      typeof window.oai.widget.setState === "function"
-    ) {
-      window.oai.widget.setState({
+    if (typeof window === "undefined") return;
+    const widgetApi = window.oai?.widget;
+    if (widgetApi && typeof widgetApi.setState === "function") {
+      widgetApi.setState({
         center: viewState.center,
         zoom: viewState.zoom,
         markers: markerCoords,
@@ -249,13 +254,13 @@ export default function App() {
             displayMode === "fullscreen" && maxHeight
               ? maxHeight - 40
               : 480,
-          ...themeVars,
+          ...containerStyle
         }}
         className={
-          "relative antialiased w-full min-h-[480px] overflow-hidden flex items-center justify-center bg-white " +
+          "relative antialiased w-full min-h-[480px] overflow-hidden flex items-center justify-center" +
           (displayMode === "fullscreen"
-            ? "rounded-none border-0"
-            : "border border-black/10 dark:border-white/10 rounded-2xl sm:rounded-3xl")
+            ? " rounded-none border-0"
+            : " border border-black/10 dark:border-white/10 rounded-2xl sm:rounded-3xl")
         }
       >
         <Outlet />
@@ -278,20 +283,21 @@ export default function App() {
             displayMode === "fullscreen" && maxHeight
               ? maxHeight - 40
               : 480,
-          ...themeVars,
+          ...containerStyle
         }}
         className={
-          "relative antialiased w-full min-h-[480px] overflow-hidden " +
+          "relative antialiased w-full min-h-[480px] overflow-hidden" +
           (displayMode === "fullscreen"
-            ? "rounded-none border-0"
-            : "border border-black/10 dark:border-white/10 rounded-2xl sm:rounded-3xl")
+            ? " rounded-none border-0"
+            : " border border-black/10 dark:border-white/10 rounded-2xl sm:rounded-3xl")
         }
       >
         <Outlet />
         {displayMode !== "fullscreen" && (
           <button
             aria-label="Enter fullscreen"
-            className="absolute top-4 right-4 z-30 rounded-full bg-white text-black shadow-lg ring ring-black/5 p-2.5 pointer-events-auto"
+            className="absolute top-4 right-4 z-30 rounded-full text-black shadow-lg ring ring-black/5 p-2.5 pointer-events-auto"
+            style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
             onClick={() => {
               if (selectedId) {
                 navigate("..", { replace: true });
@@ -358,7 +364,8 @@ export default function App() {
             {["Open now", "Top rated", "Vegeterian friendly"].map((label) => (
               <button
                 key={label}
-                className="rounded-full font-base bg-white ring ring-black/10 text-black px-4 py-1.5 text-sm hover:bg-[#f7f7f7] cursor-pointer"
+                className="rounded-full font-base ring ring-black/10 text-black px-4 py-1.5 text-sm cursor-pointer"
+                style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
               >
                 {label}
               </button>

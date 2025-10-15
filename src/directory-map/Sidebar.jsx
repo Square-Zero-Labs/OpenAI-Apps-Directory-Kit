@@ -65,6 +65,7 @@ export default function Sidebar({ places, selectedId, onSelect, ui }) {
   const scrollRef = React.useRef(null);
   const [showBottomFade, setShowBottomFade] = React.useState(false);
   const headerTitle = ui?.copy?.listTitle ?? "Directory results";
+  const backgroundColor = ui?.theme?.background ?? "#F8FAFC";
 
   const updateBottomFadeVisibility = React.useCallback(() => {
     const el = scrollRef.current;
@@ -98,9 +99,13 @@ export default function Sidebar({ places, selectedId, onSelect, ui }) {
       >
         <div
           ref={scrollRef}
-          className="relative px-2 h-full overflow-y-auto bg-white text-black"
+          className="relative px-2 h-full overflow-y-auto text-black"
+          style={{ backgroundColor }}
         >
-          <div className="flex justify-between flex-row items-center px-3 sticky bg-white top-0 py-4 text-md font-medium">
+          <div
+            className="flex justify-between flex-row items-center px-3 sticky top-0 py-4 text-md font-medium"
+            style={{ backgroundColor }}
+          >
             <div>
               {headerTitle}
               <span className="text-sm text-black/50 ml-2">{places.length}</span>
@@ -157,7 +162,11 @@ export default function Sidebar({ places, selectedId, onSelect, ui }) {
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="px-3 py-3 flex gap-3">
               {places.map((place) => (
-                <div className="ring ring-black/10 max-w-[330px] w-full shadow-xl rounded-2xl bg-white">
+                <div
+                  className="ring ring-black/10 max-w-[330px] w-full shadow-xl rounded-2xl"
+                  style={{ backgroundColor }}
+                  key={place.id}
+                >
                   <PlaceListItem
                     key={place.id}
                     place={place}

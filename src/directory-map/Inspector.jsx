@@ -18,12 +18,16 @@ export default function Inspector({ place, onClose, ui }) {
     >
       <button
         aria-label="Close details"
-        className="inline-flex absolute z-10 top-4 left-4 xl:top-4 xl:left-4 shadow-xl rounded-full p-2 bg-white ring ring-black/10 xl:shadow-2xl hover:bg-white"
+        className="inline-flex absolute z-10 top-4 left-4 xl:top-4 xl:left-4 shadow-xl rounded-full p-2 text-black ring ring-black/10 xl:shadow-2xl"
+        style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
         onClick={onClose}
       >
         <X className="h-[18px] w-[18px]" aria-hidden="true" />
       </button>
-      <div className="relative h-full overflow-y-auto rounded-none xl:rounded-3xl bg-white text-black xl:shadow-xl xl:ring ring-black/10">
+      <div
+        className="relative h-full overflow-y-auto rounded-none xl:rounded-3xl text-black xl:shadow-xl xl:ring ring-black/10"
+        style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
+      >
         <div className="relative mt-2 xl:mt-0 px-2 xl:px-0">
           {place.thumbnail ? (
             <img

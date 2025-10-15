@@ -103,6 +103,42 @@ const directoryConfigPath = fileURLToPath(directoryConfigUrl);
 const directoryDataPath = fileURLToPath(directoryDataUrl);
 const assetVariantCache = new Map<string, string>();
 
+function loadEnvFile(envUrl: URL) {
+  try {
+    const contents = readFileSync(envUrl, "utf8");
+    for (const rawLine of contents.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith("#")) continue;
+      const eq = line.indexOf("=");
+      if (eq === -1) continue;
+      const key = line.slice(0, eq).trim();
+      if (!key) continue;
+      let value = line.slice(eq + 1).trim();
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
+        value = value.slice(1, -1);
+      }
+      if (!(key in process.env)) {
+        process.env[key] = value;
+      }
+    }
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException)?.code;
+    if (code !== "ENOENT") {
+      console.warn(
+        "[directory] Failed to read env file",
+        fileURLToPath(envUrl),
+        error
+      );
+    }
+  }
+}
+
+loadEnvFile(new URL(".env", serverRoot));
+loadEnvFile(new URL(".env", repoRoot));
+
 function loadDirectoryConfigFromDisk(): DirectoryConfig {
   const raw = readFileSync(directoryConfigUrl, "utf8");
   return JSON.parse(raw) as DirectoryConfig;
@@ -357,7 +393,7 @@ async function fetchDirectoryItems(
         }
 
         if (filters?.limit && Number.isFinite(filters.limit)) {
-          query.limit(Math.max(1, Math.min(100, filters.limit)));
+          query.limit(Math.max(1, Math.min(40, filters.limit)));
         }
 
         if (dataSource.orderBy?.column) {
@@ -429,8 +465,10 @@ async function fetchDirectoryItems(
   });
 
   if (limit && Number.isFinite(limit)) {
-    return filtered.slice(0, Math.max(0, Math.min(100, limit)));
+    return filtered.slice(0, Math.max(0, Math.min(40, limit)));
   }
+
+  return filtered.slice(0, 40);
 
   return filtered;
 }

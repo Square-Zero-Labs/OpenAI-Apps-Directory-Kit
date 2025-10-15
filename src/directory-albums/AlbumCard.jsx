@@ -4,8 +4,9 @@ function AlbumCard({ album, onSelect }) {
   return (
     <button
       type="button"
-      className="group relative cursor-pointer flex-shrink-0 w-[272px] bg-white text-left"
+      className="group relative cursor-pointer flex-shrink-0 w-[272px] text-left"
       onClick={() => onSelect?.(album)}
+      style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
     >
       <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-lg">
         <img

@@ -42,7 +42,10 @@ function AlbumsCarousel({ albums, onSelect, logoUrl, title, subtitle }) {
   }, [emblaApi]);
 
   return (
-    <div className="antialiased relative w-full text-black py-5 select-none">
+    <div
+      className="antialiased relative w-full text-black py-5 select-none"
+      style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
+    >
       <div className="flex items-center justify-between px-5 pb-3">
         <div>
           <div className="text-lg font-semibold">
@@ -107,7 +110,8 @@ function AlbumsCarousel({ albums, onSelect, logoUrl, title, subtitle }) {
       {canPrev && (
         <button
           aria-label="Previous"
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-8 w-8 rounded-full bg-white text-black shadow-lg ring ring-black/5 hover:bg-white"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-8 w-8 rounded-full text-black shadow-lg ring ring-black/5"
+          style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
           onClick={() => emblaApi && emblaApi.scrollPrev()}
           type="button"
         >
@@ -121,7 +125,8 @@ function AlbumsCarousel({ albums, onSelect, logoUrl, title, subtitle }) {
       {canNext && (
         <button
           aria-label="Next"
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-8 w-8 rounded-full bg-white text-black shadow-lg ring ring-black/5 hover:bg-white"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-8 w-8 rounded-full text-black shadow-lg ring ring-black/5"
+          style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
           onClick={() => emblaApi && emblaApi.scrollNext()}
           type="button"
         >
@@ -150,6 +155,13 @@ function App() {
     !widgetProps || (widgetProps && widgetProps._directoryFallback);
   const ui = widgetProps?.ui ?? defaultDirectoryUi;
   const themeVars = themeStyleVars(ui.theme);
+  const containerStyle = React.useMemo(
+    () => ({
+      ...themeVars,
+      backgroundColor: ui.theme?.background ?? "#F8FAFC"
+    }),
+    [themeVars, ui.theme]
+  );
   const logoUrl = ui.branding?.logoUrl ?? null;
 
   const displayMode = useOpenAiGlobal("displayMode");
@@ -191,7 +203,7 @@ function App() {
     <div
       className="relative antialiased w-full"
       style={{
-        ...themeVars,
+        ...containerStyle,
         maxHeight,
         height: isFullscreen ? maxHeight : undefined,
       }}

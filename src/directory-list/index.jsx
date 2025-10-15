@@ -24,6 +24,13 @@ function App() {
     !widgetProps || (widgetProps && widgetProps._directoryFallback);
   const ui = widgetProps?.ui ?? defaultDirectoryUi;
   const themeVars = themeStyleVars(ui.theme);
+  const containerStyle = React.useMemo(
+    () => ({
+      ...themeVars,
+      backgroundColor: ui.theme?.background ?? "#F8FAFC"
+    }),
+    [themeVars, ui.theme]
+  );
   const items = React.useMemo(
     () => (isLoading ? [] : widgetProps?.items ?? []),
     [isLoading, widgetProps]
@@ -39,8 +46,8 @@ function App() {
 
   return (
     <div
-      className="antialiased w-full text-black px-4 pb-2 border border-black/10 rounded-2xl sm:rounded-3xl overflow-hidden bg-white"
-      style={themeVars}
+      className="antialiased w-full text-black px-4 pb-2 border border-black/10 rounded-2xl sm:rounded-3xl overflow-hidden"
+      style={containerStyle}
     >
       <div className="max-w-full">
         <div className="flex flex-row items-center gap-4 sm:gap-4 border-b border-black/5 py-4">

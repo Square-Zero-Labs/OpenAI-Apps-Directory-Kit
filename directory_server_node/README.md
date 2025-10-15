@@ -25,7 +25,7 @@ The server listens on port `8000` by default (`PORT` can override). Connect Chat
 
 - `config/directory.json` controls copy, theming, field mapping, and optional Supabase connection details. The root `pnpm dev` / `pnpm build` commands (and the new Vite plugin) regenerate `src/directory-defaults.ts` from this file so the demo widgets render the same configuration without any manual duplication.
 - `data/directory-places.json` provides fallback data when a remote source is unavailable; the frontend preview defaults reuse this dataset as well.
-- Set the `SUPABASE_SERVICE_ROLE_KEY` environment variable (and adjust the config) to fetch real data from Supabase.
+- Copy `.env.example` to `.env`, supply `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`, and adjust the config to fetch real data from Supabase. You can also export those variables in your shell instead of using `.env`.
 
 The server watches both files for changes and reloads them automatically, so you can edit configuration and fallback data without restarting the process. The front-end widgets start with a whimsical loading state and only render real places after the refreshed data arrives.
 

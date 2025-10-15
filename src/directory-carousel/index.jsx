@@ -25,6 +25,13 @@ function App() {
     !widgetProps || (widgetProps && widgetProps._directoryFallback);
   const ui = widgetProps?.ui ?? defaultDirectoryUi;
   const themeVars = themeStyleVars(ui.theme);
+  const containerStyle = React.useMemo(
+    () => ({
+      ...themeVars,
+      backgroundColor: ui.theme?.background ?? "#F8FAFC"
+    }),
+    [themeVars, ui.theme]
+  );
   const items = React.useMemo(
     () => (isLoading ? [] : widgetProps?.items ?? []),
     [isLoading, widgetProps]
@@ -61,8 +68,8 @@ function App() {
 
   return (
     <div
-      className="antialiased relative w-full text-black py-5 bg-white"
-      style={themeVars}
+      className="antialiased relative w-full text-black py-5"
+      style={containerStyle}
     >
       <div className="flex items-center justify-between px-4 pb-3">
         <div>
@@ -142,7 +149,8 @@ function App() {
       {!isLoading && canPrev && (
         <button
           aria-label="Previous"
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-8 w-8 rounded-full bg-white text-black shadow-lg ring ring-black/5 hover:bg-white"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-8 w-8 rounded-full text-black shadow-lg ring ring-black/5"
+          style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
           onClick={() => emblaApi && emblaApi.scrollPrev()}
           type="button"
         >
@@ -156,7 +164,8 @@ function App() {
       {!isLoading && canNext && (
         <button
           aria-label="Next"
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-8 w-8 rounded-full bg-white text-black shadow-lg ring ring-black/5 hover:bg-white"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-8 w-8 rounded-full text-black shadow-lg ring ring-black/5"
+          style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
           onClick={() => emblaApi && emblaApi.scrollNext()}
           type="button"
         >

@@ -34,11 +34,13 @@ export default function FullscreenViewer({
 
   const baseClass =
     "absolute inset-0 z-30 flex w-full h-full " +
-    (fullscreen ? "bg-white" : "bg-white/95 backdrop-blur");
+    (fullscreen ? "" : "backdrop-blur");
+
+  const backgroundColor = "var(--directory-background, #F8FAFC)";
 
   const containerStyle = fullscreen
-    ? { maxHeight, height: maxHeight }
-    : { height: "100%" };
+    ? { maxHeight, height: maxHeight, backgroundColor }
+    : { height: "100%", backgroundColor };
 
   const slidesCount = slides.length;
 
@@ -48,7 +50,8 @@ export default function FullscreenViewer({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-40 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-black shadow-lg ring ring-black/10 hover:bg-white"
+          className="absolute right-4 top-4 z-40 inline-flex h-9 w-9 items-center justify-center rounded-full text-black shadow-lg ring ring-black/10"
+          style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
         >
           <span className="sr-only">Close album</span>
           <X className="h-4.5 w-4.5" aria-hidden="true" />
@@ -111,7 +114,8 @@ export default function FullscreenViewer({
             <>
               <button
                 type="button"
-                className="absolute left-4 top-1/2 -translate-y-1/2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-black shadow-lg ring ring-black/5"
+                className="absolute left-4 top-1/2 -translate-y-1/2 inline-flex h-9 w-9 items-center justify-center rounded-full text-black shadow-lg ring ring-black/5"
+                style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
                 onClick={() => emblaApi?.scrollPrev()}
                 aria-label="Previous photo"
               >
@@ -119,7 +123,8 @@ export default function FullscreenViewer({
               </button>
               <button
                 type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-black shadow-lg ring ring-black/5"
+                className="absolute right-4 top-1/2 -translate-y-1/2 inline-flex h-9 w-9 items-center justify-center rounded-full text-black shadow-lg ring ring-black/5"
+                style={{ backgroundColor: "var(--directory-background, #F8FAFC)" }}
                 onClick={() => emblaApi?.scrollNext()}
                 aria-label="Next photo"
               >
