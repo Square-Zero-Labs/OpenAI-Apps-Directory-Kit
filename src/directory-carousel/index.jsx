@@ -9,13 +9,30 @@ import {
   defaultDirectoryUi,
 } from "../directory-defaults";
 import { normalizeDirectoryItems, themeStyleVars } from "../directory-utils";
+import LoadingPlaceholder from "../directory-loading/LoadingPlaceholder";
 
 function App() {
-  const widgetProps = useWidgetProps(() => defaultStructuredContent);
-  const items = widgetProps?.items ?? defaultStructuredContent.items;
+  const fallbackContent = React.useMemo(
+    () => ({
+      ...defaultStructuredContent,
+      items: [],
+      _directoryFallback: true,
+    }),
+    []
+  );
+  const widgetProps = useWidgetProps(() => fallbackContent);
+  const isLoading =
+    !widgetProps || (widgetProps && widgetProps._directoryFallback);
   const ui = widgetProps?.ui ?? defaultDirectoryUi;
   const themeVars = themeStyleVars(ui.theme);
-  const places = normalizeDirectoryItems(items, ui);
+  const items = React.useMemo(
+    () => (isLoading ? [] : widgetProps?.items ?? []),
+    [isLoading, widgetProps]
+  );
+  const places = React.useMemo(
+    () => normalizeDirectoryItems(items, ui),
+    [items, ui]
+  );
   const logoUrl = ui.branding?.logoUrl ?? null;
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "center",
@@ -52,11 +69,11 @@ function App() {
           <div className="text-lg font-semibold">
             {ui.copy?.listTitle ?? ui.copy?.appTitle ?? "Highlights"}
           </div>
-          <div className="text-sm text-black/60">
-            {ui.copy?.listSubtitle ?? null}
-          </div>
-        </div>
-        {logoUrl && (
+      <div className="text-sm text-black/60">
+        {ui.copy?.listSubtitle ?? null}
+      </div>
+    </div>
+    {logoUrl && (
           <div className="h-10 w-10 rounded-lg overflow-hidden border border-black/10 flex-shrink-0">
             <img
               src={logoUrl}
@@ -64,52 +81,65 @@ function App() {
               className="h-full w-full object-cover"
               loading="lazy"
             />
+        </div>
+      )}
+    </div>
+      <div className="overflow-hidden" ref={emblaRef}>
+        {isLoading ? (
+          <LoadingPlaceholder
+            theme={ui.theme}
+            message="Scooping up standout spots…"
+            subMessage="One second. The carousel crew is doing their stretches."
+            className="min-h-[220px]"
+          />
+        ) : (
+          <div className="flex gap-4 max-sm:mx-5 items-stretch">
+            {places.map((place) => (
+              <PlaceCard key={place.id} place={place} ui={ui} />
+            ))}
           </div>
         )}
       </div>
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex gap-4 max-sm:mx-5 items-stretch">
-          {places.map((place) => (
-            <PlaceCard key={place.id} place={place} ui={ui} />
-          ))}
-        </div>
-      </div>
-      {/* Edge gradients */}
-      <div
-        aria-hidden
-        className={
-          "pointer-events-none absolute inset-y-0 left-0 w-3 z-[5] transition-opacity duration-200 " +
-          (canPrev ? "opacity-100" : "opacity-0")
-        }
-      >
-        <div
-          className="h-full w-full border-l border-black/15 bg-gradient-to-r from-black/10 to-transparent"
-          style={{
-            WebkitMaskImage:
-              "linear-gradient(to bottom, transparent 0%, white 30%, white 70%, transparent 100%)",
-            maskImage:
-              "linear-gradient(to bottom, transparent 0%, white 30%, white 70%, transparent 100%)",
-          }}
-        />
-      </div>
-      <div
-        aria-hidden
-        className={
-          "pointer-events-none absolute inset-y-0 right-0 w-3 z-[5] transition-opacity duration-200 " +
-          (canNext ? "opacity-100" : "opacity-0")
-        }
-      >
-        <div
-          className="h-full w-full border-r border-black/15 bg-gradient-to-l from-black/10 to-transparent"
-          style={{
-            WebkitMaskImage:
-              "linear-gradient(to bottom, transparent 0%, white 30%, white 70%, transparent 100%)",
-            maskImage:
-              "linear-gradient(to bottom, transparent 0%, white 30%, white 70%, transparent 100%)",
-          }}
-        />
-      </div>
-      {canPrev && (
+      {!isLoading && (
+        <>
+          {/* Edge gradients */}
+          <div
+            aria-hidden
+            className={
+              "pointer-events-none absolute inset-y-0 left-0 w-3 z-[5] transition-opacity duration-200 " +
+              (canPrev ? "opacity-100" : "opacity-0")
+            }
+          >
+            <div
+              className="h-full w-full border-l border-black/15 bg-gradient-to-r from-black/10 to-transparent"
+              style={{
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, transparent 0%, white 30%, white 70%, transparent 100%)",
+                maskImage:
+                  "linear-gradient(to bottom, transparent 0%, white 30%, white 70%, transparent 100%)",
+              }}
+            />
+          </div>
+          <div
+            aria-hidden
+            className={
+              "pointer-events-none absolute inset-y-0 right-0 w-3 z-[5] transition-opacity duration-200 " +
+              (canNext ? "opacity-100" : "opacity-0")
+            }
+          >
+            <div
+              className="h-full w-full border-r border-black/15 bg-gradient-to-l from-black/10 to-transparent"
+              style={{
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, transparent 0%, white 30%, white 70%, transparent 100%)",
+                maskImage:
+                  "linear-gradient(to bottom, transparent 0%, white 30%, white 70%, transparent 100%)",
+              }}
+            />
+          </div>
+        </>
+      )}
+      {!isLoading && canPrev && (
         <button
           aria-label="Previous"
           className="absolute left-2 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-8 w-8 rounded-full bg-white text-black shadow-lg ring ring-black/5 hover:bg-white"
@@ -123,7 +153,7 @@ function App() {
           />
         </button>
       )}
-      {canNext && (
+      {!isLoading && canNext && (
         <button
           aria-label="Next"
           className="absolute right-2 top-1/2 -translate-y-1/2 z-10 inline-flex items-center justify-center h-8 w-8 rounded-full bg-white text-black shadow-lg ring ring-black/5 hover:bg-white"

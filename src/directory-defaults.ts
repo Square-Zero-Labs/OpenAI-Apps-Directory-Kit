@@ -11,7 +11,7 @@ export const defaultDirectoryUi = {
   "copy": {
     "appTitle": "Directory Demo",
     "listTitle": "City Highlights",
-    "listSubtitle": "A shortlist of places locals love",
+    "listSubtitle": "A shortlist of places locals ❤️",
     "emptyState": "No places match yet.",
     "inspectorLocationLabel": "San Francisco Bay Area",
     "filterLabel": "Filter",
@@ -190,7 +190,7 @@ export const defaultStructuredContent = {
     "copy": {
       "appTitle": "Directory Demo",
       "listTitle": "City Highlights",
-      "listSubtitle": "A shortlist of places locals love",
+      "listSubtitle": "A shortlist of places locals ❤️",
       "emptyState": "No places match yet.",
       "inspectorLocationLabel": "San Francisco Bay Area",
       "filterLabel": "Filter",

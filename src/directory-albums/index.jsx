@@ -13,6 +13,7 @@ import {
 import { themeStyleVars } from "../directory-utils";
 import FullscreenViewer from "./FullscreenViewer";
 import AlbumCard from "./AlbumCard";
+import LoadingPlaceholder from "../directory-loading/LoadingPlaceholder";
 
 function AlbumsCarousel({ albums, onSelect, logoUrl, title, subtitle }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -136,7 +137,17 @@ function AlbumsCarousel({ albums, onSelect, logoUrl, title, subtitle }) {
 }
 
 function App() {
-  const widgetProps = useWidgetProps(() => defaultStructuredContent);
+  const fallbackContent = React.useMemo(
+    () => ({
+      ...defaultStructuredContent,
+      items: [],
+      _directoryFallback: true,
+    }),
+    []
+  );
+  const widgetProps = useWidgetProps(() => fallbackContent);
+  const isLoading =
+    !widgetProps || (widgetProps && widgetProps._directoryFallback);
   const ui = widgetProps?.ui ?? defaultDirectoryUi;
   const themeVars = themeStyleVars(ui.theme);
   const logoUrl = ui.branding?.logoUrl ?? null;
@@ -150,13 +161,14 @@ function App() {
 
   const handleSelectAlbum = React.useCallback(
     (album) => {
+      if (isLoading) return;
       setSelectedAlbum(album);
       const requestDisplayMode = window?.webplus?.requestDisplayMode;
       if (!isFullscreen && requestDisplayMode) {
         requestDisplayMode({ mode: "fullscreen" }).catch?.(() => {});
       }
     },
-    [isFullscreen]
+    [isFullscreen, isLoading]
   );
 
   const handleCloseAlbum = React.useCallback(() => {
@@ -167,7 +179,13 @@ function App() {
     }
   }, [isFullscreen]);
 
-  const overlayActive = Boolean(selectedAlbum);
+  React.useEffect(() => {
+    if (isLoading && selectedAlbum) {
+      setSelectedAlbum(null);
+    }
+  }, [isLoading, selectedAlbum]);
+
+  const overlayActive = !isLoading && Boolean(selectedAlbum);
 
   return (
     <div
@@ -178,13 +196,22 @@ function App() {
         height: isFullscreen ? maxHeight : undefined,
       }}
     >
-      <AlbumsCarousel
-        albums={albums}
-        onSelect={handleSelectAlbum}
-        logoUrl={logoUrl}
-        title={ui.copy?.listTitle ?? ui.copy?.appTitle}
-        subtitle={ui.copy?.listSubtitle}
-      />
+      {isLoading ? (
+        <LoadingPlaceholder
+          theme={ui.theme}
+          message="Polishing the photo reels…"
+          subMessage="The album curator is flipping through the good stuff now."
+          className="min-h-[260px]"
+        />
+      ) : (
+        <AlbumsCarousel
+          albums={albums}
+          onSelect={handleSelectAlbum}
+          logoUrl={logoUrl}
+          title={ui.copy?.listTitle ?? ui.copy?.appTitle}
+          subtitle={ui.copy?.listSubtitle}
+        />
+      )}
 
       {overlayActive && (
         <FullscreenViewer

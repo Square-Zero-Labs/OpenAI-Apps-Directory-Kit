@@ -26,17 +26,72 @@ const toServerRoot = (abs: string) => {
   return "./" + rel;
 };
 
+function serializeForScript(value: unknown): string {
+  return JSON.stringify(value).replace(/<\//g, "<\\/");
+}
+
+function buildDevStructuredContent(): Record<string, unknown> | null {
+  try {
+    const configRaw = fs.readFileSync(directoryConfigPaths.config, {
+      encoding: "utf8",
+    });
+    const dataRaw = fs.readFileSync(directoryConfigPaths.data, {
+      encoding: "utf8",
+    });
+
+    const config = JSON.parse(configRaw) as Record<string, any>;
+    const data = JSON.parse(dataRaw) as Record<string, any>;
+
+    const ui = {
+      theme: config?.theme ?? {},
+      copy: config?.copy ?? {},
+      branding: config?.branding ?? {},
+      fields: config?.fields ?? {},
+      map: config?.map ?? {},
+      filters: config?.filters ?? {},
+    } satisfies Record<string, unknown>;
+
+    const items = Array.isArray(data?.items) ? data.items : [];
+
+    const resultsTitle =
+      config?.copy?.listTitle ??
+      config?.copy?.appTitle ??
+      config?.label ??
+      "Directory Results";
+
+    const structured: Record<string, unknown> = {
+      resultsTitle,
+      items,
+      ui,
+    };
+
+    if (config?.label || config?.slug) {
+      structured.directory = {
+        label: config?.label ?? null,
+        slug: config?.slug ?? null,
+      };
+    }
+
+    return structured;
+  } catch (error) {
+    console.warn("[directory] Failed to load dev tool output", error);
+    return null;
+  }
+}
+
 function multiEntryDevEndpoints(options: {
   entries: Record<string, string>;
   globalCss?: string[];
   perEntryCssGlob?: string;
   perEntryCssIgnore?: string[];
+  getDevToolOutput?: () => Record<string, unknown> | null;
 }): Plugin {
   const {
     entries,
     globalCss = ["src/index.css"],
     perEntryCssGlob = "**/*.{css,pcss,scss,sass}",
     perEntryCssIgnore = ["**/*.module.*"],
+    getDevToolOutput,
   } = options;
 
   const V_PREFIX = "\0multi-entry:"; // Rollup “virtual module” prefix
@@ -73,9 +128,10 @@ function multiEntryDevEndpoints(options: {
 </body>
 </html>`;
 
-  const renderDevHtml = (name: string): string => `<!doctype html>
+  const renderDevHtml = (name: string, toolOutputScript: string | null): string => `<!doctype html>
 <html>
 <head>
+  ${toolOutputScript ?? ""}
   <script type="module" src="/${name}.js"></script>
   <link rel="stylesheet" href="/${name}.css">
   </head>
@@ -93,6 +149,14 @@ function multiEntryDevEndpoints(options: {
         .join("\n  ");
       server.config.logger.info(`\nDev endpoints:\n  ${list}\n`);
 
+      const toolScriptForRequest = (): string | null => {
+        if (server.config.command !== "serve") return null;
+        const injected = getDevToolOutput?.();
+        if (!injected) return null;
+        const toolOutputJson = serializeForScript(injected);
+        return `<script>\n(function(){\n  const toolOutput = ${toolOutputJson};\n  window.__DIRECTORY_DEV_TOOL_OUTPUT__ = toolOutput;\n  window.openai = window.openai ?? {};\n  if (!window.openai.toolOutput) {\n    window.openai.toolOutput = toolOutput;\n  }\n  window.openai.displayMode = window.openai.displayMode ?? "inline";\n  window.openai.maxHeight = window.openai.maxHeight ?? 640;\n  window.openai.theme = window.openai.theme ?? "light";\n  window.oai = window.oai ?? {};\n  if (!window.oai.toolOutput) {\n    window.oai.toolOutput = toolOutput;\n  }\n})();\n</script>`;
+      };
+
       server.middlewares.use((req, res, next) => {
         try {
           if (req.method !== "GET" || !req.url) return next();
@@ -106,7 +170,8 @@ function multiEntryDevEndpoints(options: {
           const bareMatch = url.match(/^\/?([\w-]+)\/?$/);
           if (bareMatch && entries[bareMatch[1]]) {
             const name = bareMatch[1];
-            const html = renderDevHtml(name);
+            const toolScript = toolScriptForRequest();
+            const html = renderDevHtml(name, toolScript);
             res.setHeader("Content-Type", "text/html; charset=utf-8");
             res.end(html);
             return;
@@ -119,7 +184,8 @@ function multiEntryDevEndpoints(options: {
           const name = m[1];
           if (!entries[name]) return next();
 
-          const html = renderDevHtml(name);
+          const toolScript = toolScriptForRequest();
+          const html = renderDevHtml(name, toolScript);
           res.setHeader("Content-Type", "text/html");
           res.end(html);
           return;
@@ -241,7 +307,10 @@ export default defineConfig(({}) => ({
     directoryConfigPlugin(),
     tailwindcss(),
     react(),
-    multiEntryDevEndpoints({ entries: inputs }),
+    multiEntryDevEndpoints({
+      entries: inputs,
+      getDevToolOutput: () => (process.env.NODE_ENV === "development" ? buildDevStructuredContent() : null),
+    }),
   ],
   cacheDir: "node_modules/.vite-react",
   server: {

@@ -25,6 +25,7 @@ import {
   normalizeDirectoryItems,
   themeStyleVars,
 } from "../directory-utils";
+import LoadingPlaceholder from "../directory-loading/LoadingPlaceholder";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZXJpY25pbmciLCJhIjoiY21icXlubWM1MDRiczJvb2xwM2p0amNyayJ9.n-3O6JI5nOp_Lw96ZO5vJQ";
@@ -46,10 +47,23 @@ export default function App() {
   const mapRef = useRef(null);
   const mapObj = useRef(null);
   const markerObjs = useRef([]);
-  const widgetProps = useWidgetProps(() => defaultStructuredContent);
-  const items = widgetProps?.items ?? defaultStructuredContent.items;
+  const fallbackContent = useMemo(
+    () => ({
+      ...defaultStructuredContent,
+      items: [],
+      _directoryFallback: true,
+    }),
+    []
+  );
+  const widgetProps = useWidgetProps(() => fallbackContent);
+  const isLoading =
+    !widgetProps || (widgetProps && widgetProps._directoryFallback);
   const ui = widgetProps?.ui ?? defaultDirectoryUi;
   const themeVars = useMemo(() => themeStyleVars(ui.theme), [ui.theme]);
+  const items = useMemo(
+    () => (isLoading ? [] : widgetProps?.items ?? []),
+    [isLoading, widgetProps]
+  );
   const normalizedPlaces = useMemo(
     () => normalizeDirectoryItems(items, ui),
     [items, ui]
@@ -79,44 +93,68 @@ export default function App() {
   const maxHeight = useMaxHeight() ?? undefined;
 
   useEffect(() => {
+    if (isLoading) return;
     if (mapObj.current) return;
-    mapObj.current = new mapboxgl.Map({
+    if (!mapRef.current) return;
+
+    const mapInstance = new mapboxgl.Map({
       container: mapRef.current,
       style: "mapbox://styles/mapbox/streets-v12",
       center: markerCoords.length > 0 ? markerCoords[0] ?? [0, 0] : [0, 0],
       zoom: markerCoords.length > 0 ? ui.map?.defaultZoom ?? 12 : 2,
       attributionControl: false,
     });
+    mapObj.current = mapInstance;
     addAllMarkers(normalizedPlaces);
     setTimeout(() => {
-      fitMapToMarkers(mapObj.current, markerCoords);
+      if (mapObj.current) {
+        fitMapToMarkers(mapObj.current, markerCoords);
+      }
     }, 0);
-    // after first paint
-    requestAnimationFrame(() => mapObj.current.resize());
 
-    // or keep it in sync with window resizes
-    window.addEventListener("resize", mapObj.current.resize);
+    const handleResize = () => mapInstance.resize();
+    requestAnimationFrame(handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener("resize", mapObj.current.resize);
-      mapObj.current.remove();
+      window.removeEventListener("resize", handleResize);
+      markerObjs.current.forEach((m) => m.remove());
+      markerObjs.current = [];
+      mapInstance.remove();
+      if (mapObj.current === mapInstance) {
+        mapObj.current = null;
+      }
     };
-    // eslint-disable-next-line
-  }, []);
+  }, [
+    isLoading,
+    markerCoords,
+    normalizedPlaces,
+    ui.map?.defaultZoom,
+    markerColor,
+  ]);
 
   useEffect(() => {
-    if (!mapObj.current) return;
+    if (!isLoading || !mapObj.current) return;
+    markerObjs.current.forEach((m) => m.remove());
+    markerObjs.current = [];
+    mapObj.current.remove();
+    mapObj.current = null;
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (isLoading || !mapObj.current) return;
     const handler = () => {
       const c = mapObj.current.getCenter();
       setViewState({ center: [c.lng, c.lat], zoom: mapObj.current.getZoom() });
     };
     mapObj.current.on("moveend", handler);
     return () => {
-      mapObj.current.off("moveend", handler);
+      mapObj.current?.off("moveend", handler);
     };
-  }, []);
+  }, [isLoading]);
 
   function addAllMarkers(placesList) {
+    if (!mapObj.current) return;
     markerObjs.current.forEach((m) => m.remove());
     markerObjs.current = [];
     placesList.forEach((place) => {
@@ -170,21 +208,23 @@ export default function App() {
 
   useEffect(() => {
     if (!mapObj.current) return;
+    if (isLoading) return;
     addAllMarkers(normalizedPlaces);
     fitMapToMarkers(mapObj.current, markerCoords);
-  }, [normalizedPlaces, markerCoords]);
+  }, [normalizedPlaces, markerCoords, isLoading]);
 
   // Pan the map when the selected place changes via routing
   useEffect(() => {
-    if (!mapObj.current || !selectedPlace || !selectedPlace.coords) return;
+    if (isLoading || !mapObj.current || !selectedPlace || !selectedPlace.coords)
+      return;
     panTo(selectedPlace.coords, { offsetForInspector: true });
-  }, [selectedId]);
+  }, [selectedId, isLoading]);
 
   // Ensure Mapbox resizes when container maxHeight/display mode changes
   useEffect(() => {
-    if (!mapObj.current) return;
+    if (isLoading || !mapObj.current) return;
     mapObj.current.resize();
-  }, [maxHeight, displayMode]);
+  }, [maxHeight, displayMode, isLoading]);
 
   useEffect(() => {
     if (
@@ -199,6 +239,35 @@ export default function App() {
       });
     }
   }, [viewState, markerCoords]);
+
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          maxHeight,
+          height:
+            displayMode === "fullscreen" && maxHeight
+              ? maxHeight - 40
+              : 480,
+          ...themeVars,
+        }}
+        className={
+          "relative antialiased w-full min-h-[480px] overflow-hidden flex items-center justify-center bg-white " +
+          (displayMode === "fullscreen"
+            ? "rounded-none border-0"
+            : "border border-black/10 dark:border-white/10 rounded-2xl sm:rounded-3xl")
+        }
+      >
+        <Outlet />
+        <LoadingPlaceholder
+          theme={ui.theme}
+          message="Charting the neighborhood…"
+          subMessage="Hang tight while we wrangle the newest pins."
+          className="w-full"
+        />
+      </div>
+    );
+  }
 
   return (
     <>

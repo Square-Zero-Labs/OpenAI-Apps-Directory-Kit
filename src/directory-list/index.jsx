@@ -7,13 +7,31 @@ import {
   defaultDirectoryUi,
 } from "../directory-defaults";
 import { normalizeDirectoryItems, themeStyleVars } from "../directory-utils";
+import LoadingPlaceholder from "../directory-loading/LoadingPlaceholder";
 
 function App() {
-  const widgetProps = useWidgetProps(() => defaultStructuredContent);
-  const items = widgetProps?.items ?? defaultStructuredContent.items;
+  const fallbackContent = React.useMemo(
+    () => ({
+      ...defaultStructuredContent,
+      items: [],
+      _directoryFallback: true,
+    }),
+    []
+  );
+
+  const widgetProps = useWidgetProps(() => fallbackContent);
+  const isLoading =
+    !widgetProps || (widgetProps && widgetProps._directoryFallback);
   const ui = widgetProps?.ui ?? defaultDirectoryUi;
   const themeVars = themeStyleVars(ui.theme);
-  const places = normalizeDirectoryItems(items, ui);
+  const items = React.useMemo(
+    () => (isLoading ? [] : widgetProps?.items ?? []),
+    [isLoading, widgetProps]
+  );
+  const places = React.useMemo(
+    () => normalizeDirectoryItems(items, ui),
+    [items, ui]
+  );
   const listTitle = ui.copy?.listTitle ?? "Directory List";
   const listSubtitle = ui.copy?.listSubtitle ?? "Curated directory entries";
   const logoUrl = ui.branding?.logoUrl ?? null;
@@ -46,75 +64,86 @@ function App() {
           </div>
           <div className="flex-auto hidden sm:flex justify-end pr-2" />
         </div>
-        <div className="min-w-full text-sm flex flex-col">
-          {places.slice(0, 7).map((place, i) => (
-            <div
-              key={place.id}
-              className="px-3 -mx-2 rounded-2xl hover:bg-black/5"
-            >
+        {isLoading ? (
+          <LoadingPlaceholder
+            theme={ui.theme}
+            message="Dusting off the latest hot spots…"
+            subMessage="Give us a moment while we pick the freshest places for you."
+            className="min-h-[240px]"
+          />
+        ) : (
+          <div className="min-w-full text-sm flex flex-col">
+            {places.slice(0, 7).map((place, i) => (
               <div
-                style={{
-                  borderBottom:
-                    i === 7 - 1 ? "none" : "1px solid rgba(0, 0, 0, 0.05)",
-                }}
-                className="flex w-full items-center hover:border-black/0! gap-2"
+                key={place.id}
+                className="px-3 -mx-2 rounded-2xl hover:bg-black/5"
               >
-                <div className="py-3 pr-3 min-w-0 w-full sm:w-3/5">
-                  <div className="flex items-center gap-3">
-                    {place.thumbnail ? (
-                      <img
-                        src={place.thumbnail}
-                        alt={place.title}
-                        className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg object-cover ring ring-black/5"
-                      />
-                    ) : (
-                      <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg bg-[var(--directory-primary, #2563EB)]/10 text-[var(--directory-primary, #2563EB)] flex items-center justify-center font-semibold">
-                        {place.title?.charAt(0) ?? "?"}
+                <div
+                  style={{
+                    borderBottom:
+                      i === 7 - 1 ? "none" : "1px solid rgba(0, 0, 0, 0.05)",
+                  }}
+                  className="flex w-full items-center hover:border-black/0! gap-2"
+                >
+                  <div className="py-3 pr-3 min-w-0 w-full sm:w-3/5">
+                    <div className="flex items-center gap-3">
+                      {place.thumbnail ? (
+                        <img
+                          src={place.thumbnail}
+                          alt={place.title}
+                          className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg object-cover ring ring-black/5"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg bg-[var(--directory-primary, #2563EB)]/10 text-[var(--directory-primary, #2563EB)] flex items-center justify-center font-semibold">
+                          {place.title?.charAt(0) ?? "?"}
+                        </div>
+                      )}
+                      <div className="w-3 text-end sm:block hidden text-sm text-black/40">
+                        {i + 1}
                       </div>
-                    )}
-                    <div className="w-3 text-end sm:block hidden text-sm text-black/40">
-                      {i + 1}
-                    </div>
-                    <div className="min-w-0 sm:pl-1 flex flex-col items-start h-full">
-                      <div className="font-medium text-sm sm:text-md truncate max-w-[40ch]">
-                        {place.title}
-                      </div>
-                      <div className="mt-1 sm:mt-0.25 flex items-center gap-3 text-black/70 text-sm">
-                        {place.rating != null ? (
-                          <div className="flex items-center gap-1">
-                            <Star
-                              strokeWidth={1.5}
-                              className="h-3 w-3 text-black"
-                            />
-                            <span>
-                              {place.rating?.toFixed
-                                ? place.rating.toFixed(1)
-                                : place.rating}
-                            </span>
+                      <div className="min-w-0 sm:pl-1 flex flex-col items-start h-full">
+                        <div className="font-medium text-sm sm:text-md truncate max-w-[40ch]">
+                          {place.title}
+                        </div>
+                        <div className="mt-1 sm:mt-0.25 flex items-center gap-3 text-black/70 text-sm">
+                          {place.rating != null ? (
+                            <div className="flex items-center gap-1">
+                              <Star
+                                strokeWidth={1.5}
+                                className="h-3 w-3 text-black"
+                              />
+                              <span>
+                                {place.rating?.toFixed
+                                  ? place.rating.toFixed(1)
+                                  : place.rating}
+                              </span>
+                            </div>
+                          ) : null}
+                          <div className="whitespace-nowrap sm:hidden">
+                            {place.subtitle || "–"}
                           </div>
-                        ) : null}
-                        <div className="whitespace-nowrap sm:hidden">
-                          {place.subtitle || "–"}
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="hidden sm:block text-end py-2 px-3 text-sm text-black/60 whitespace-nowrap flex-auto">
-                  {place.subtitle || "–"}
-                </div>
-                <div className="py-2 whitespace-nowrap flex justify-end text-sm text-black/60">
-                  {place.price ? <span>{place.price}</span> : <span>Details</span>}
+                  <div className="hidden sm:block text-end py-2 px-3 text-sm text-black/60 whitespace-nowrap flex-auto">
+                    {place.subtitle || "–"}
+                  </div>
+                  <div className="py-2 whitespace-nowrap flex justify-end text-sm text-black/60">
+                    {place.price ? (
+                      <span>{place.price}</span>
+                    ) : (
+                      <span>Details</span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          {places.length === 0 && (
-            <div className="py-6 text-center text-black/60">
-              {emptyState}
-            </div>
-          )}
-        </div>
+            ))}
+            {places.length === 0 && (
+              <div className="py-6 text-center text-black/60">{emptyState}</div>
+            )}
+          </div>
+        )}
         <div className="sm:hidden px-0 pt-2 pb-2" />
       </div>
     </div>

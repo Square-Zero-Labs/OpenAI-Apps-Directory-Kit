@@ -27,7 +27,7 @@ The server listens on port `8000` by default (`PORT` can override). Connect Chat
 - `data/directory-places.json` provides fallback data when a remote source is unavailable; the frontend preview defaults reuse this dataset as well.
 - Set the `SUPABASE_SERVICE_ROLE_KEY` environment variable (and adjust the config) to fetch real data from Supabase.
 
-The server watches both files for changes and reloads them automatically, so you can edit configuration and fallback data without restarting the process.
+The server watches both files for changes and reloads them automatically, so you can edit configuration and fallback data without restarting the process. The front-end widgets start with a whimsical loading state and only render real places after the refreshed data arrives.
 
 Each tool response includes:
 

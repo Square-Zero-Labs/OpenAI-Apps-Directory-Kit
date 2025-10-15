@@ -69,7 +69,9 @@ Supported tool arguments:
 - `directory_server_node/data/directory-places.json` remains the bundled fallback dataset that seeds both the MCP server and the frontend preview defaults.
 - To use Supabase, set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in your environment before starting the server. If either value is missing, the server automatically falls back to the bundled JSON data.
 
-The MCP server now watches both JSON files and reloads them on the fly, so you can tweak copy or data without restarting the process. If you update the files while `pnpm dev` is running, the generated `src/directory-defaults.ts` refreshes automatically; otherwise run `pnpm run sync:directory` to regenerate the frontend defaults.
+The MCP server now watches both JSON files and reloads them on the fly, so you can tweak copy or data without restarting the process. If you update the files while `pnpm dev` is running, the generated `src/directory-defaults.ts` refreshes automatically; otherwise run `pnpm run sync:directory` to regenerate the frontend defaults. Inside ChatGPT the widgets first show a playful loading illustration and only render places once fresh data arrives, so users never see stale results.
+
+When you run `pnpm dev`, the local Vite server injects the latest structured content into `window.oai`, so the previews on `http://localhost:4044/<widget>.html` stay fully populated while you iterate; the hot-loading behavior remains unchanged when served through the MCP server.
 
 ## Testing in ChatGPT developer mode
 
