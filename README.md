@@ -15,13 +15,21 @@ pnpm install
 
 This single install covers the widgets and the MCP server workspace.
 
+## Build widget bundles for ChatGPT
+
+```bash
+pnpm run build
+```
+
+This command compiles the widgets into hashed bundles in `assets/`. Run it whenever you change code under `src/` or otherwise need fresh widget assets for the MCP server. After the build completes, restart the MCP server so it reloads the updated bundles. (Pure config or data edits do not require a build.)
+
 ## Start the widget dev server
 
 ```bash
 pnpm run dev
 ```
 
-The Vite dev server serves each widget at `http://localhost:4044/<widget>.html` with hot reloading. It also injects the current directory data into `window.openai.toolOutput`, so every preview renders with live content as you iterate. The dev script automatically keeps the generated defaults in sync—there is no need to run any sync or build commands during development.
+The Vite dev server serves each widget at `http://localhost:4044/<widget>.html` with hot reloading. It also injects the current directory data into `window.openai.toolOutput`, so every preview renders with live content as you iterate. The dev script automatically keeps the generated defaults in sync—no manual sync step required.
 
 ### Preview widgets locally
 
